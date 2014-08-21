@@ -29,6 +29,7 @@ if (is_dir($sSystemPath)){
 // The PHP file extension
 // this global constant is deprecated.
 define('EXT', '.php');
+define('AC', 'Ac');
 
 
 // The path to the "application" folder
