@@ -7,34 +7,60 @@
  */
 class Check {
     private $MarkedTimes = array();
+    private $MarkedMemories = array();
     
     public function Check() {
-        global $nAppStartTime;
-        $this->Add(APP_START, $nAppStartTime);
+        global $nAppStartTime, $nAppStartMemory;
+        $this->MarkTime(APP_START, $nAppStartTime);
+        $this->MarkMemory(APP_START, $nAppStartMemory);
     }
     
-    public function Add($sMarker, $nTime = null) {
+    public function MarkTime($sMarker, $nTime = null) {
         if(is_null($nTime)) {
             $nTime = array_sum(explode(' ', microtime()));
         }
         $this->MarkedTimes[$sMarker] = $nTime;
     }
     
-    public function Compare($sStartMarker, $sEndMarker = null) {
-        $MarkedTimes = $this->MarkedTimes;
-        if(!isset($MarkedTimes[$sStartMarker])) {
-            show_error("Can't find start time.");
+    public function MarkMemory($sMarker, $nSize = null) {
+        if(is_null($nSize)) {
+            $nSize = memory_get_usage(true);
         }
-        
-        $nStartTime = $MarkedTimes[$sStartMarker];
-        
-        if(!isset($MarkedTimes[$sEndMarker])) {
-            $nEndTime = array_sum(explode(' ' , microtime()));
+        $this->MarkedMemories[$sMarker] = $nSize;
+    }
+    
+    public function CompareMemories($sStartMarker = null, $sEndMarker = null) {
+        return $this->Compare($sStartMarker, $sEndMarker, 'Memory');
+    }
+    
+    public function CompareTimes($sStartMarker = null, $sEndMarker = null) {
+        return $this->Compare($sStartMarker, $sEndMarker, 'Time');
+    }
+    
+    private function Compare($sStartMarker = null, $sEndMarker = null, $sType = 'Time') {
+        $arMarketValues = $sType == 'Time' ? $this->MarkedTimes : $this->MarkedMemories;
+        if(!isset($arMarketValues[$sStartMarker])) {
+            if($sType == 'Time') {
+                show_error("Can't find start time.");
+            } else {
+                $nStartValue = 0;
+            }
         } else {
-            $nEndTime = $MarkedTimes[$sEndMarker];
+            $nStartValue = $arMarketValues[$sStartMarker];
         }
         
-        return sprintf('%.4f', $nEndTime - $nStartTime);
+        if(!isset($arMarketValues[$sEndMarker])) {
+            $nEndValue = $sType == 'Time' ? array_sum(explode(' ' , microtime())) : memory_get_usage(true);
+        } else {
+            $nEndValue = $arMarketValues[$sEndMarker];
+        }
+        
+        return $sType == 'Time' ? sprintf('%.4f', $nEndValue - $nStartValue) : $this->Convert($nEndValue - $nStartValue); 
+    }
+    
+    public function Convert($vSize) {
+        $arUnits = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        return @round($vSize/pow(1024,($i=floor(log($vSize,1024)))),2).' '.$arUnits[$i];
     }
 }
 

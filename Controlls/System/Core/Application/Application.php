@@ -13,7 +13,7 @@ class Application {
         $this->Initialize();
     }
 
-    public function __get($sName) {
+    public function &__get($sName) {
         if(isset(self::$Class[$sName])) {
             return self::$Class[$sName];
         }
@@ -28,7 +28,7 @@ class Application {
     private function Initialize() {
         $arAutoloadLibraries = array_unique(self::GetConfig('autoload_libraries'));
 
-        $arNotNeeded = array('Utf8', 'Check');
+        $arNotNeeded = array('Check', 'Utf8');
         foreach($arNotNeeded as $sNotNeeded) {
             $vCheckIfExists = array_search($sNotNeeded, $arAutoloadLibraries);
             if($vCheckIfExists !== false) {
