@@ -11,7 +11,7 @@
  * @return	string
  */
 if (!function_exists('remove_invisible_characters')) {
-	function remove_invisible_characters($str, $url_encoded = TRUE) {
+	function remove_invisible_characters($str, $url_encoded = true) {
 		$non_displayables = array();
 		
 		// every control character except newline (dec 10)
@@ -43,27 +43,27 @@ if (!function_exists('remove_invisible_characters')) {
  * @param	string
  * @return	bool	TRUE if the current version is $version or higher
  */
-if ( ! function_exists('is_php')) {
+if (!function_exists('is_php')) {
 	function is_php($version = '5.0.0') {
 		static $_is_php;
 		$version = (string)$version;
 
 		if ( ! isset($_is_php[$version])) {
-			$_is_php[$version] = (version_compare(PHP_VERSION, $version) < 0) ? FALSE : TRUE;
+			$_is_php[$version] = (version_compare(PHP_VERSION, $version) < 0) ? false : true;
 		}
 
 		return $_is_php[$version];
 	}
 }
 
-if ( ! function_exists('log_message')) {
+if (!function_exists('log_message')) {
 	function log_message($sMode, $sMessage) {
         var_dump($sMode);
         var_dump($sMessage);
     }
 }
 
-if ( ! function_exists('show_error')) {
+if (!function_exists('show_error')) {
 	function show_error($sMessage) {
         var_dump($sMessage);
     }

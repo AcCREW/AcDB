@@ -151,10 +151,10 @@ if (!function_exists('reduce_double_slashes')) {
  * @return	string
  */
 if (!function_exists('reduce_multiples')) {
-	function reduce_multiples($str, $character = ',', $trim = FALSE) {
+	function reduce_multiples($str, $character = ',', $trim = false) {
 		$str = preg_replace('#'.preg_quote($character, '#').'{2,}#', $character, $str);
 
-		if ($trim === TRUE) {
+		if ($trim === true) {
 			$str = trim($str, $character);
 		}
 
@@ -207,10 +207,9 @@ if (!function_exists('random_string')) {
 				break;
 			case 'encrypt'	:
 			case 'sha1'	:
-                $CI =& get_instance();
-                $CI->load->helper('security');
+                Application::LoadHelper('Security');
 
-                return do_hash(uniqid(mt_rand(), TRUE), 'sha1');
+                return do_hash(uniqid(mt_rand(), true), 'sha1');
 				break;
 		}
 	}

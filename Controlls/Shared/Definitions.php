@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Europe/Sofia');
+
 $sApplicationFiles = 'ApplicationFiles';
 
 $sSystemPath = 'Controlls/System';
@@ -30,6 +32,7 @@ if (is_dir($sSystemPath)){
 // this global constant is deprecated.
 define('EXT', '.php');
 define('AC', 'Ac');
+define('APP_START', 'APP_START');
 
 
 // The path to the "application" folder

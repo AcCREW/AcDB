@@ -9,7 +9,7 @@ class Application {
     static $_this = null;
 
     public function Application() {
-        self::$_this = $this;
+        self::$_this = &$this;
         $this->Initialize();
     }
 
@@ -22,11 +22,21 @@ class Application {
     }
 
     public function Start() {
-        $this->Session->set_userdata('user_id', 1993);
+        
     }
 
     private function Initialize() {
-        foreach(self::GetConfig('autoload_libraries') as $sLybraryName) {
+        $arAutoloadLibraries = array_unique(self::GetConfig('autoload_libraries'));
+
+        $arNotNeeded = array('Utf8', 'Check');
+        foreach($arNotNeeded as $sNotNeeded) {
+            $vCheckIfExists = array_search($sNotNeeded, $arAutoloadLibraries);
+            if($vCheckIfExists !== false) {
+                unset($arAutoloadLibraries[$vCheckIfExists]);
+            }
+            self::LoadLibrary($sNotNeeded);
+        }
+        foreach($arAutoloadLibraries as $sLybraryName) {
             self::LoadLibrary($sLybraryName);
         }
         foreach(self::GetConfig('autoload_helpers') as $sHelperName) {

@@ -160,11 +160,11 @@ class SHA1 {
 	function _kt($t) {
 		if ($t < 20) {
 			return 1518500249;
-		} else if ($t < 40) 	{
+		} else if ($t < 40) {
 			return 1859775393;
 		} else if ($t < 60) {
-			return -1894007588; }
-		else {
+			return -1894007588; 
+        } else {
 			return -899497514;
 		}
 	}

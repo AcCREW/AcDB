@@ -36,9 +36,8 @@
  * @return	string
  */
 if (!function_exists('xss_clean')) {
-	function xss_clean($str, $is_image = FALSE) {
-		$CI =& get_instance();
-		return $CI->security->xss_clean($str, $is_image);
+	function xss_clean($str, $is_image = false) {
+		return Application::$_this->Security->xss_clean($str, $is_image);
 	}
 }
 
@@ -53,8 +52,7 @@ if (!function_exists('xss_clean')) {
  */
 if (!function_exists('sanitize_filename')) {
 	function sanitize_filename($filename) {
-		$CI =& get_instance();
-		return $CI->security->sanitize_filename($filename);
+		return Application::$_this->Security->sanitize_filename($filename);
 	}
 }
 

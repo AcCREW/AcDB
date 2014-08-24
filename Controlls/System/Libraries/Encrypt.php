@@ -3,7 +3,7 @@ class Encrypt {
     
 	var $encryption_key	= '';
 	var $_hash_type	= 'sha1';
-	var $_mcrypt_exists = FALSE;
+	var $_mcrypt_exists = false;
 	var $_mcrypt_cipher;
 	var $_mcrypt_mode;
 
@@ -14,7 +14,7 @@ class Encrypt {
 	 *
 	 */
 	public function __construct() {
-		$this->_mcrypt_exists = ( ! function_exists('mcrypt_encrypt')) ? FALSE : TRUE;
+		$this->_mcrypt_exists = ( ! function_exists('mcrypt_encrypt')) ? false : true;
 		log_message('debug', "Encrypt Class Initialized");
 	}
 
@@ -80,7 +80,7 @@ class Encrypt {
 	function encode($string, $key = '') {
 		$key = $this->get_key($key);
 
-		if ($this->_mcrypt_exists === TRUE) {
+		if ($this->_mcrypt_exists === true) {
 			$enc = $this->mcrypt_encode($string, $key);
 		} else {
 			$enc = $this->_xor_encode($string, $key);
@@ -105,14 +105,14 @@ class Encrypt {
 		$key = $this->get_key($key);
 
 		if (preg_match('/[^a-zA-Z0-9\/\+=]/', $string)) {
-			return FALSE;
+			return false;
 		}
 
 		$dec = base64_decode($string);
 
-		if ($this->_mcrypt_exists === TRUE) {
-			if (($dec = $this->mcrypt_decode($dec, $key)) === FALSE) {
-				return FALSE;
+		if ($this->_mcrypt_exists === true) {
+			if (($dec = $this->mcrypt_decode($dec, $key)) === false) {
+				return false;
 			}
 		} else {
 			$dec = $this->_xor_decode($dec, $key);
@@ -140,9 +140,9 @@ class Encrypt {
 	 * @return	string
 	 */
 	function encode_from_legacy($string, $legacy_mode = MCRYPT_MODE_ECB, $key = '') {
-		if ($this->_mcrypt_exists === FALSE) {
+		if ($this->_mcrypt_exists === false) {
 			log_message('error', 'Encoding from legacy is available only when Mcrypt is in use.');
-			return FALSE;
+			return false;
 		}
 
 		// decode it first
@@ -154,13 +154,13 @@ class Encrypt {
 		$key = $this->get_key($key);
 
 		if (preg_match('/[^a-zA-Z0-9\/\+=]/', $string)) {
-			return FALSE;
+			return false;
 		}
 
 		$dec = base64_decode($string);
 
-		if (($dec = $this->mcrypt_decode($dec, $key)) === FALSE) {
-			return FALSE;
+		if (($dec = $this->mcrypt_decode($dec, $key)) === false) {
+			return false;
 		}
 
 		$dec = $this->_xor_decode($dec, $key);
@@ -278,7 +278,7 @@ class Encrypt {
 		$init_size = mcrypt_get_iv_size($this->_get_cipher(), $this->_get_mode());
 
 		if ($init_size > strlen($data)) {
-			return FALSE;
+			return false;
 		}
 
 		$init_vect = substr($data, 0, $init_size);
@@ -418,7 +418,7 @@ class Encrypt {
 	 * @return	string
 	 */
 	function set_hash($type = 'sha1') {
-		$this->_hash_type = ($type != 'sha1' AND $type != 'md5') ? 'sha1' : $type;
+		$this->_hash_type = ($type != 'sha1' && $type != 'md5') ? 'sha1' : $type;
 	}
 
 	// --------------------------------------------------------------------
