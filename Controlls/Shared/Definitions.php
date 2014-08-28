@@ -6,6 +6,10 @@ $sApplicationFiles = 'ApplicationFiles';
 
 $sSystemPath = 'Controlls/System';
 
+define('DEFAULT_CONTROLLER', 'Index');
+
+define('ACPATH', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+
 // Set the current directory correctly for CLI requests
 if (defined('STDIN')) {
     chdir(dirname(__FILE__));
@@ -41,3 +45,4 @@ if (is_dir($sApplicationFiles)) {
 } else {
     exit("Your application folder path does not appear to be set correctly. Please open the following file and correct this: ".SELF);
 }
+

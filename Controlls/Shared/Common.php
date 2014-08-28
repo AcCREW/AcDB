@@ -58,6 +58,7 @@ if (!function_exists('is_php')) {
 
 if (!function_exists('log_message')) {
 	function log_message($sMode, $sMessage) {
+        return;
         var_dump($sMode);
         var_dump($sMessage);
     }
