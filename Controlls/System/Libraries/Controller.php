@@ -5,11 +5,11 @@
  *
  * @author Венцислав Кьоровски
  */
-class Controller {
+class Controller extends stdClass{
    
     public function __construct() {
-        foreach(Application::$Class as $sClassName => $Class) {
-            $this->$sClassName = &$Class;     
+        foreach(array_keys(Application::$Class) as $sClassName) {
+            $this->$sClassName = Application::LoadLibrary($sClassName);     
         }
 		log_message('debug', "Controller Class Initialized");
     }
