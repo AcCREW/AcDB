@@ -1,5 +1,5 @@
 <?php 
-class Session {
+class AcSession {
 
     var $sess_use_database          = false; //TRUE STILL NOT SUPPORTED
 	var $sess_encrypt_cookie		= false;

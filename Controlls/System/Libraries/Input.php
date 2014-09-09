@@ -26,7 +26,7 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/libraries/input.html
  */
-class Input {
+class AcInput {
 
 	/**
 	 * IP address of the current user

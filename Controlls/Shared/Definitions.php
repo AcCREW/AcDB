@@ -37,6 +37,10 @@ if (is_dir($sSystemPath)){
 define('EXT', '.php');
 define('AC', 'Ac');
 define('APP_START', 'APP_START');
+define('MODULES', 'Modules');
+define('VIEWS', 'Views');
+define('LIBRARIES', 'Libraries');
+define('HELPERS', 'Helpers');
 
 
 // The path to the "application" folder

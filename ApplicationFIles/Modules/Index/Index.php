@@ -1,12 +1,12 @@
 <?php
 
-class Index extends Controller {
+class Index extends AcController {
     public function Index() {
         parent::__construct();
     }
     
     public function HelloWorld() {
         var_dump($this->URI->segments);
-        return '</br >Hello World!<br /><br />';
+        return $this->Parser->Parse('Index', 'Index');
     }
 }

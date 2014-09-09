@@ -1,5 +1,5 @@
 <?php
-class URI {
+class AcURI {
 
 	/**
      * Current uri string

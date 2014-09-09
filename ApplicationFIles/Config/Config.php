@@ -4,7 +4,7 @@
  * Setting default configs needed.
  */
 
-Application::SetConfig('autoload_libraries', array('URI', 'Session'));
+Application::SetConfig('autoload_libraries', array('URI', 'Session', 'Parser'));
 Application::SetConfig('autoload_helpers', array());
 Application::SetConfig('encryption_key', 'AcDB');
 Application::SetConfig('allow_get_array', true);

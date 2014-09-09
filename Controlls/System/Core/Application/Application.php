@@ -55,22 +55,31 @@ class Application {
     }
 
     public static function LoadLibrary($sName, $bInitializeClass = true) {
-        return self::Load($sName, 'Libraries', $bInitializeClass);
+        return self::Load($sName, LIBRARIES, $bInitializeClass);
     }
     
     public static function LoadModule($sName) {
-        return self::Load($sName, 'Modules');
+        return self::Load($sName, MODULES);
     }
 
     public static function LoadHelper($sName) {
-        return self::Load($sName, 'Helpers');
+        return self::Load($sName, HELPERS);
+    }
+    
+    public static function LoadTemplate($sName, $sModule) {
+        $sFile = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sModule.DIRECTORY_SEPARATOR.VIEWS.DIRECTORY_SEPARATOR.$sName.EXT;
+        if(!file_exists($sFile)) {
+            exit("Unable to load file '".$sFile."'.");
+        }
+        
+        return file_get_contents($sFile);
     }
 
-    public static function Load($sName, $sType = 'Libraries', $bInitializeClass = true) {
-        if($sType == 'Libraries' && isset(self::$Class[$sName])) {
+    public static function Load($sName, $sType = LIBRARIES, $bInitializeClass = true) {
+        if($sType == LIBRARIES && isset(self::$Class[$sName])) {
             return self::$Class[$sName];
         }
-        if($sType == 'Modules') {
+        if($sType == MODULES) {
             $sFile = APPPATH.$sType.DIRECTORY_SEPARATOR.$sName.DIRECTORY_SEPARATOR.$sName.EXT;
         } else {
             $sFile = SYSDIR.$sType.DIRECTORY_SEPARATOR.$sName.EXT;
@@ -79,12 +88,13 @@ class Application {
             exit("Unable to load file '".$sFile."'.");
         }
         require_once($sFile);
-        if(in_array($sType, array('Libraries', 'Modules'))) {
-            if(!class_exists($sName)) {
+        $sClassName = $sType == LIBRARIES ? AC.$sName : $sName;
+        if(in_array($sType, array(LIBRARIES, MODULES))) {
+            if(!class_exists($sClassName)) {
                 exit("Unable to load class '".$sName."' from file '".$sFile."'.");
             }
             if($bInitializeClass) {
-                $Class = new $sName;
+                $Class = new $sClassName;
                 self::$Class[$sName] = $Class;
                 return $Class;
             } else {
