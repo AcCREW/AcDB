@@ -7,6 +7,9 @@ class Application {
     static $Config = array();
     static $Class = array();
     static $_this = null;
+    
+    private $PreloadedJSs = array();
+    private $PreloadedCSSs = array();
 
     public function Application() {
         self::$_this = &$this;
@@ -30,9 +33,27 @@ class Application {
         if(!method_exists($Module, $sFunction)) {
             exit("Function '".$sFunction."' doesn't exists in class '".$sModule."'.");
         }
-        $sContent = call_user_func_array(array(&$Module, $sFunction), array_slice($arSegments, 2));
         
-        echo $sContent;
+        $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
+        $sTemplateDir =  'Templates/'.$sTemplate;
+        $sTMPDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sTemplateDir.DIRECTORY_SEPARATOR;
+
+        $arTemplateJson = json_decode(self::LoadJSON($sTMPDir.'template.json'));
+        if(!$arTemplateJson->Enabled) {
+            exit("The template '".$sTemplate."' is not enabled.");
+        }
+        foreach($arTemplateJson->CSS as $sLink) {
+            $this->LoadCSS($sTMPDir.$sLink);
+        }
+        foreach($arTemplateJson->JS as $sLink) {
+            $this->LoadJS($sTMPDir.$sLink);
+        }
+        $arData = array();
+        $arData['Content'] = call_user_func_array(array(&$Module, $sFunction), array_slice($arSegments, 2));
+        $arData['JS'] = $this->PreloadedJSs;
+        $arData['CSS'] = $this->PreloadedCSSs;
+        
+        echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
     }
 
     private function Initialize() {
@@ -66,15 +87,28 @@ class Application {
         return self::Load($sName, HELPERS);
     }
     
+    public static function LoadJSON($sName) {
+        return preg_replace('/[\x00-\x1F\x80-\xFF]/', '', self::LoadFile($sName)); 
+    }
+    
     public static function LoadTemplate($sName, $sModule) {
         $sFile = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sModule.DIRECTORY_SEPARATOR.VIEWS.DIRECTORY_SEPARATOR.$sName.EXT;
+        
+        return self::LoadFile($sFile);
+    }
+    
+    public static function LoadFile($sFile, $bRequre = false) {
         if(!file_exists($sFile)) {
             exit("Unable to load file '".$sFile."'.");
         }
         
-        return file_get_contents($sFile);
+        if($bRequre) {
+            require_once($sFile);
+        } else {
+            return file_get_contents($sFile);
+        }
     }
-
+    
     public static function Load($sName, $sType = LIBRARIES, $bInitializeClass = true) {
         if($sType == LIBRARIES && isset(self::$Class[$sName])) {
             return self::$Class[$sName];
@@ -84,10 +118,8 @@ class Application {
         } else {
             $sFile = SYSDIR.$sType.DIRECTORY_SEPARATOR.$sName.EXT;
         }
-        if(!is_file($sFile)) {
-            exit("Unable to load file '".$sFile."'.");
-        }
-        require_once($sFile);
+        
+        self::LoadFile($sFile, true);
         $sClassName = $sType == LIBRARIES ? AC.$sName : $sName;
         if(in_array($sType, array(LIBRARIES, MODULES))) {
             if(!class_exists($sClassName)) {
@@ -115,6 +147,30 @@ class Application {
             return false;
         }
         return self::$Config[$sKey];
+    }
+    
+    public function LoadJS($vLink = null) {
+        if(empty($vLink)) {
+            return false;
+        }
+        
+        if(!is_array($vLink)) {
+            $vLink = array('Link' => $vLink);
+        }
+        
+        $this->PreloadedJSs = array_merge($this->PreloadedJSs, array($vLink));
+    }
+    
+    public function LoadCSS($vLink = null) {
+        if(empty($vLink)) {
+            return false;
+        }
+        
+        if(!is_array($vLink)) {
+            $vLink = array('Link' => $vLink);
+        }
+        
+        $this->PreloadedCSSs = array_merge($this->PreloadedCSSs, array($vLink));
     }
 }
 

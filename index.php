@@ -7,8 +7,8 @@ require_once("./Controlls/System/Core/Application/Application.php");
 $Application = new Application();
 $Application->Start();
 
-echo $Application->Check->CompareTimes(APP_START);
-echo '<br />';
-echo $Application->Check->CompareMemories();
+//echo $Application->Check->CompareTimes(APP_START);
+//echo '<br />';
+//echo $Application->Check->CompareMemories();
 
 ?>

@@ -7,6 +7,7 @@ $sApplicationFiles = 'ApplicationFiles';
 $sSystemPath = 'Controlls/System';
 
 define('DEFAULT_CONTROLLER', 'Index');
+define('DEFAULT_TEMPLATE', 'Default');
 
 define('ACPATH', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 
@@ -41,6 +42,7 @@ define('MODULES', 'Modules');
 define('VIEWS', 'Views');
 define('LIBRARIES', 'Libraries');
 define('HELPERS', 'Helpers');
+define('TEMPLATES', 'Templates');
 
 
 // The path to the "application" folder

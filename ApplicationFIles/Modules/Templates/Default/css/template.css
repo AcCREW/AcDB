@@ -1,0 +1,75 @@
+.right_content {
+    width: 100%;
+    padding: 10px;
+}
+
+.fa {
+    padding-right: 6px;
+}
+.clear {
+    clear: both;
+    display: block;
+}
+
+@media only screen and (max-width: 1024px) {
+    .metro .grid.fluid .row [class*="span"].left_content_span9 {
+        margin-left: 0;
+    }
+    .metro .grid.fluid .row .span9.left_content_span9 {
+        width: 100%!important;
+    }
+}
+
+
+#AcLoading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    min-height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+}
+
+    #AcLoading #AcLoaderBar {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #fff;
+        height: 2px;
+        z-index: 1001;
+    }
+
+        #AcLoading #AcLoaderBar #AcLoaderBarFill {
+            width: 0%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #1ba1e2;
+            height: 2px;
+            z-index: 1002;
+        }
+
+    #AcLoading #AcLoader {
+        text-align: center;
+        display: block;
+        vertical-align: middle;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 400px;
+        height: 50px;
+        margin-left: -200px;
+        margin-top: -25px;
+    }
+
+        #AcLoading #AcLoader #AcLoaderMessage {
+            color: #ffffff;
+        }
+
+        #AcLoading #AcLoader #AcLoaderSpin {
+            padding-bottom: 5px;
+        }

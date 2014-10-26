@@ -6,7 +6,6 @@ class Index extends AcController {
     }
     
     public function HelloWorld() {
-        var_dump($this->URI->segments);
-        return $this->Parser->Parse('Index', 'Index');
+        return $this->Parser->Parse('Index', 'Index', array('message' => 'Hello World !'));
     }
 }

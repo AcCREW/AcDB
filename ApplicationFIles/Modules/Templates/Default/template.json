@@ -1,0 +1,18 @@
+﻿{
+   "Author": "Ac0",
+   "Enabled": true,
+   "CSS": [
+      "css/metro-bootstrap.min.css",
+      "css/metro-bootstrap-responsive.min.css",
+      "css/font-awesome.min.css",
+      "css/template.css"
+   ],
+   "JS": [
+      "js/jquery/jquery.js",
+      "js/jquery/jquery.widget.js",
+      "js/angular.min.js",
+      "js/metro/metro.min.js",
+      "js/common.js",
+      "js/angular_edit_object.js"
+   ]
+}
