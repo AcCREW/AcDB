@@ -12,7 +12,6 @@
       "js/jquery/jquery.widget.js",
       "js/angular.min.js",
       "js/metro/metro.min.js",
-      "js/common.js",
-      "js/angular_edit_object.js"
+      "js/common.js"
    ]
 }

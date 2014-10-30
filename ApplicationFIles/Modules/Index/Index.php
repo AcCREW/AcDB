@@ -3,6 +3,7 @@
 class Index extends AcController {
     public function Index() {
         parent::__construct();
+        return $this->HelloWorld();
     }
     
     public function HelloWorld() {

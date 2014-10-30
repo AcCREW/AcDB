@@ -1,0 +1,9 @@
+﻿{
+   "Author": "Ac0",
+   "Enabled": true,
+   "CSS": [
+   ],
+   "JS": [
+      "js/angular_edit_object.js"
+   ]
+}

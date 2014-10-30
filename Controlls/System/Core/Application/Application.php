@@ -36,22 +36,14 @@ class Application {
         
         $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
         $sTemplateDir =  'Templates/'.$sTemplate;
-        $sTMPDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sTemplateDir.DIRECTORY_SEPARATOR;
 
-        $arTemplateJson = json_decode(self::LoadJSON($sTMPDir.'template.json'));
-        if(!$arTemplateJson->Enabled) {
-            exit("The template '".$sTemplate."' is not enabled.");
-        }
-        foreach($arTemplateJson->CSS as $sLink) {
-            $this->LoadCSS($sTMPDir.$sLink);
-        }
-        foreach($arTemplateJson->JS as $sLink) {
-            $this->LoadJS($sTMPDir.$sLink);
-        }
+        $TemplateInfo = self::LoadJSON($sTemplate, TEMPLATES);
+        $ModuleInfo = self::LoadJSON($sModule);
+        
         $arData = array();
-        $arData['Content'] = call_user_func_array(array(&$Module, $sFunction), array_slice($arSegments, 2));
-        $arData['JS'] = $this->PreloadedJSs;
-        $arData['CSS'] = $this->PreloadedCSSs;
+        $arData['RightContent'] = call_user_func_array(array(&$Module, $sFunction), array_slice($arSegments, 2));
+        $arData['PreloadedJS'] = $this->PreloadedJSs;
+        $arData['PreloadedCSS'] = $this->PreloadedCSSs;
         
         echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
     }
@@ -87,8 +79,30 @@ class Application {
         return self::Load($sName, HELPERS);
     }
     
-    public static function LoadJSON($sName) {
-        return preg_replace('/[\x00-\x1F\x80-\xFF]/', '', self::LoadFile($sName)); 
+    public static function LoadJSON($sName, $sType = MODULES) {
+        if($sType == MODULES) {
+            $sDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sName.DIRECTORY_SEPARATOR;
+            $sPath = $sDir.MODULE_JSON;
+            $sString = 'module';
+        } elseif($sType == TEMPLATES) {
+            $sDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.$sName.DIRECTORY_SEPARATOR;
+            $sPath = $sDir.TEMPLATE_JSON;
+            $sString = 'template';
+        } else {
+            exit("Invalid request for JSON.");
+        }
+        $Object = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', self::LoadFile($sPath)));
+        if(!$Object->Enabled) {
+            exit("The ".$sString." '".$sTemplate."' is not enabled.");
+        }
+        foreach($Object->CSS as $sLink) {
+            self::$_this->LoadCSS($sDir.$sLink);
+        }
+        foreach($Object->JS as $sLink) {
+            self::$_this->LoadJS($sDir.$sLink);
+        }
+        $Object->Dir = $sDir;
+        return $Object; 
     }
     
     public static function LoadTemplate($sName, $sModule) {

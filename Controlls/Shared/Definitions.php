@@ -8,6 +8,8 @@ $sSystemPath = 'Controlls/System';
 
 define('DEFAULT_CONTROLLER', 'Index');
 define('DEFAULT_TEMPLATE', 'Default');
+define('TEMPLATE_JSON', 'template.json');
+define('MODULE_JSON', 'module.json');
 
 define('ACPATH', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 
