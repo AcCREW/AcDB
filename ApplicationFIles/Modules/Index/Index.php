@@ -3,10 +3,9 @@
 class Index extends AcController {
     public function Index() {
         parent::__construct();
-        return $this->HelloWorld();
     }
     
-    public function HelloWorld() {
-        return $this->Parser->Parse('Index', 'Index', array('message' => 'Hello World !'));
+    public function Render() {
+        return $this->Parser->Parse('Index', 'Index', array('Message' => 'Welcome to AcGenerator!', 'Module' => 'Index'));
     }
 }

@@ -66,6 +66,7 @@ if (!function_exists('log_message')) {
 
 if (!function_exists('show_error')) {
 	function show_error($sMessage) {
-        var_dump($sMessage);
+        trigger_error($sMessage);
+        exit;
     }
 }

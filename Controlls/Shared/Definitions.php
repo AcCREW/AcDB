@@ -7,11 +7,12 @@ $sApplicationFiles = 'ApplicationFiles';
 $sSystemPath = 'Controlls/System';
 
 define('DEFAULT_CONTROLLER', 'Index');
+define('DEFAULT_FUNCTION', 'Render');
 define('DEFAULT_TEMPLATE', 'Default');
 define('TEMPLATE_JSON', 'template.json');
 define('MODULE_JSON', 'module.json');
 
-define('ACPATH', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+define('ACPATH', current(explode('index.php', 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'])));
 
 // Set the current directory correctly for CLI requests
 if (defined('STDIN')) {
@@ -38,6 +39,8 @@ if (is_dir($sSystemPath)){
 // The PHP file extension
 // this global constant is deprecated.
 define('EXT', '.php');
+define('JS', 'js');
+define('CSS', 'css');
 define('AC', 'Ac');
 define('APP_START', 'APP_START');
 define('MODULES', 'Modules');

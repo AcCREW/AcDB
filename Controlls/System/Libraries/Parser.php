@@ -84,6 +84,8 @@ class AcParser {
 		if ($template == '') {
 			return false;
 		}
+        
+        $data['BaseURL'] = ACPATH;
 
 		foreach ($data as $key => $val) {
 			if (is_array($val)) {

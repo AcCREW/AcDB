@@ -6,6 +6,7 @@ require_once("./Controlls/Shared/Common.php");
 class Application {
     static $Config = array();
     static $Class = array();
+    static $JSON = array();
     static $_this = null;
     
     private $PreloadedJSs = array();
@@ -25,27 +26,36 @@ class Application {
     }
 
     public function Start() {
-        $arSegments = $this->URI->segments;
-        $sModule = ucfirst(strtolower(isset($arSegments[0]) ? $arSegments[0] : DEFAULT_CONTROLLER));
-        $sFunction = ucfirst(strtolower(isset($arSegments[1]) ? $arSegments[1] : $sModule));
+        #region - Fetching Module & Function
+        $sModulePath = $this->Input->get('Module');
+        $sModulePath = ucfirst(strtolower($sModulePath !== false ? $sModulePath : DEFAULT_CONTROLLER));
+        $arModule = explode('/', $sModulePath);
+        $sModule = ucfirst(end($arModule));
+        $sFunction = $this->Input->get('Function');
+        $sFunction = ucfirst(strtolower($sFunction !== false ? $sFunction : DEFAULT_FUNCTION));
+        #endregion
         
-        $Module = self::LoadModule($sModule);
-        if(!method_exists($Module, $sFunction)) {
-            exit("Function '".$sFunction."' doesn't exists in class '".$sModule."'.");
-        }
-        
+        #region - Load Template - 
         $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
-        $sTemplateDir =  'Templates/'.$sTemplate;
-
+        $sTemplateDir =  '../Templates/'.$sTemplate;
         $TemplateInfo = self::LoadJSON($sTemplate, TEMPLATES);
-        $ModuleInfo = self::LoadJSON($sModule);
+        #endregion
         
+        #region - Load Module -
+        $Module = self::LoadModule($sModulePath);
+        if(!method_exists($Module, $sFunction)) {
+            show_error("Function '".$sFunction."' doesn't exists in class '".$sModulePath."'.");
+        }
+        $ModuleInfo = self::LoadJSON($sModulePath, MODULES, $Module);
+        #endregion
+        
+        #region - Parsing Data to Template -
         $arData = array();
-        $arData['RightContent'] = call_user_func_array(array(&$Module, $sFunction), array_slice($arSegments, 2));
+        $arData['RightContent'] = call_user_func_array(array(&$Module, $sFunction), array());
         $arData['PreloadedJS'] = $this->PreloadedJSs;
         $arData['PreloadedCSS'] = $this->PreloadedCSSs;
-        
         echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
+        #endregion
     }
 
     private function Initialize() {
@@ -79,29 +89,42 @@ class Application {
         return self::Load($sName, HELPERS);
     }
     
-    public static function LoadJSON($sName, $sType = MODULES) {
+    public static function LoadJSON($sNamePath, $sType = MODULES, &$Module = null) {
+        $arName = explode('/', $sNamePath);
+        $sName = ucfirst(end($arName));
+        if(isset(self::$JSON[$sName])) {
+            return self::$JSON[$sName];
+        }
         if($sType == MODULES) {
-            $sDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sName.DIRECTORY_SEPARATOR;
+            $sDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sNamePath.DIRECTORY_SEPARATOR;
             $sPath = $sDir.MODULE_JSON;
             $sString = 'module';
         } elseif($sType == TEMPLATES) {
-            $sDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.$sName.DIRECTORY_SEPARATOR;
+            $sDir = APPPATH.TEMPLATES.DIRECTORY_SEPARATOR.$sNamePath.DIRECTORY_SEPARATOR;
             $sPath = $sDir.TEMPLATE_JSON;
             $sString = 'template';
         } else {
-            exit("Invalid request for JSON.");
+            show_error("Invalid request for JSON.");
         }
         $Object = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', self::LoadFile($sPath)));
         if(!$Object->Enabled) {
-            exit("The ".$sString." '".$sTemplate."' is not enabled.");
+            show_error("The ".$sString." '".$sName."' is not enabled.");
+        }
+        if(property_exists($Object, 'AngularJSIncluded') && $Object->AngularJSIncluded) {
+            self::$_this->LoadJS(ACPATH.$sDir.JS.DIRECTORY_SEPARATOR.'Angular'.$sName.'.'.JS);
         }
         foreach($Object->CSS as $sLink) {
-            self::$_this->LoadCSS($sDir.$sLink);
+            self::$_this->LoadCSS(ACPATH.$sDir.$sLink);
         }
         foreach($Object->JS as $sLink) {
-            self::$_this->LoadJS($sDir.$sLink);
+            self::$_this->LoadJS(ACPATH.$sDir.$sLink);
         }
         $Object->Dir = $sDir;
+        if(!is_null($Module)) {
+            foreach (get_object_vars($Object) as $sKey => $vValue) {
+                $Module->$sKey = $vValue;
+            }
+        }
         return $Object; 
     }
     
@@ -113,7 +136,7 @@ class Application {
     
     public static function LoadFile($sFile, $bRequre = false) {
         if(!file_exists($sFile)) {
-            exit("Unable to load file '".$sFile."'.");
+            show_error("Unable to load file '".$sFile."'.");
         }
         
         if($bRequre) {
@@ -123,24 +146,26 @@ class Application {
         }
     }
     
-    public static function Load($sName, $sType = LIBRARIES, $bInitializeClass = true) {
+    public static function Load($sNamePath, $sType = LIBRARIES, $bInitializeClass = true) {
+        $arName = explode('/', $sNamePath);
+        $sName = ucfirst(end($arName));
         if($sType == LIBRARIES && isset(self::$Class[$sName])) {
             return self::$Class[$sName];
         }
         if($sType == MODULES) {
-            $sFile = APPPATH.$sType.DIRECTORY_SEPARATOR.$sName.DIRECTORY_SEPARATOR.$sName.EXT;
+            $sFile = APPPATH.$sType.DIRECTORY_SEPARATOR.$sNamePath.DIRECTORY_SEPARATOR.$sName.EXT;
         } else {
-            $sFile = SYSDIR.$sType.DIRECTORY_SEPARATOR.$sName.EXT;
+            $sFile = SYSDIR.$sType.DIRECTORY_SEPARATOR.$sNamePath.EXT;
         }
         
         self::LoadFile($sFile, true);
         $sClassName = $sType == LIBRARIES ? AC.$sName : $sName;
         if(in_array($sType, array(LIBRARIES, MODULES))) {
             if(!class_exists($sClassName)) {
-                exit("Unable to load class '".$sName."' from file '".$sFile."'.");
+                show_error("Unable to load class '".$sName."' from file '".$sFile."'.");
             }
             if($bInitializeClass) {
-                $Class = new $sClassName;
+                $Class = new $sClassName();
                 self::$Class[$sName] = $Class;
                 return $Class;
             } else {

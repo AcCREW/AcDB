@@ -2,9 +2,7 @@
 
 /* Controllers */
 
-var AcGenerator = angular.module('AcGenerator', []);
-
-AcGenerator.controller('EditObject', function ($scope, $http) {
+AcGenerator.controller('Object', function ($scope, $http) {
     $scope.ObjectText = "New Object";
     $scope.ObjectName = "NewObject";
     $scope.ObjectTableName = "";
