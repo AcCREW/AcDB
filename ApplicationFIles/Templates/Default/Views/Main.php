@@ -1,112 +1,102 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="AcGenerator">
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AcGenerator</title>
-    {PreloadedCSS}
-    <link rel="stylesheet" href="{Link}" />
-    {/PreloadedCSS}
-    {PreloadedJS}
-    <script src="{Link}"></script>
-    {/PreloadedJS}
-    <style>
-        #user_settings::after {
-            content: none !important;
-        }
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>{SiteTitle} - {ModuleTitle}</title>
+	{PreloadedCSS}<link rel="stylesheet" href="{Link}" />
+	{/PreloadedCSS}
+    <script type="text/javascript" src="{BaseURL}ApplicationFiles/Templates/Default/js/angular/require.js" charset="UTF8"></script>
+	<script>
+	    var BaseURL = "{BaseURL}";
+	    requirejs.config({
+	        baseUrl: 'js/',
+	        paths: {PreloadedJS},
+	        shim: {
+	            'bootstrap': ['jquery'],
+	            'angular': ['jquery', 'bootstrap'],
+	            'ocLazyLoad': ['angular'],
+	            'AcGenerator': ['ocLazyLoad'],
+	            'AngularIndex': []
+	        }
+	    });
 
-        #user_settings {
-            padding-right: 0 !important;
-            margin-right: 0 !important;
-        }
-    </style>
-
+	    requirejs(['AcGenerator'], function () {
+	        angular.bootstrap(document.body, ['AcGenerator']);
+	    });
+	</script>
 </head>
-<body class="metro">
-    <div class="navigation-bar dark">
-        <div class="navigation-bar-content">
-            <a class="element">
-                <i class="fa fa-gears"></i>
-                AcGenerator
-                <small>[stop coding bulshitz]</small>
-            </a>
-            <span class="element-divider"></span>
-            <a class="element1 pull-menu" href="#"></a>
-            <ul class="element-menu">
-                <li>
-                    <a href="{BaseURL}">
-                        <i class="fa fa-home"></i>
-                        Home
-                    </a>
-                </li>
-                <span class="element-divider"></span>
-                <li>
-                    <a href="{BaseURL}index.php?Module=Acp/Object">
-                        <i class="fa fa-plus"></i>
-                        New object
-                    </a>
-                </li>
-            </ul>
-            <span class="element-divider"></span>
-        </div>
-    </div>
-    <div class="grid fluid">
-        <div class="row" style="margin-top: 0;">
-            <div class="span3 no-tablet">
-                <nav class="sidebar light">
-                    <ul>
-                        <li style="margin-top: 0;" class="active">
-                            <a href="#">
-                                <i class="fa fa-home"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-cog"></i>
-                                Layouts
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-toggle" href="#">
-                                <i class="fa fa-plus-square"></i>
-                                Sub menu
-                            </a>
-                            <ul class="dropdown-menu" data-role="dropdown">
-                                <li>
-                                    <a href="">Subitem 1</a>
-                                </li>
-                                <li>
-                                    <a href="">Subitem 2</a>
-                                </li>
-                                <li>
-                                    <a href="">Subitem 3</a>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="">Subitem 4</a>
-                                </li>
-                                <li class="disabled">
-                                    <a href="">Subitem 4</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Thread item</a>
-                        </li>
-                        <li class="disabled">
-                            <a href="#">Disabled item</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="span9 left_content_span9" style="border: 1px solid #eeeeee; color: #555555;">
-                <div class="right_content">
-                    {RightContent}
-                </div>
-            </div>
-        </div>
-    </div>
+<body data-ng-controller="AcController">
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" style="width: 200px;">AcDB</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="#">Link <span class="sr-only">(current)</span></a></li>
+					<li><a href="#">Link</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="#">Action</a></li>
+							<li><a href="#">Another action</a></li>
+							<li><a href="#">Something else here</a></li>
+							<li class="divider"></li>
+							<li><a href="#">Separated link</a></li>
+							<li class="divider"></li>
+							<li><a href="#">One more separated link</a></li>
+						</ul>
+					</li>
+				</ul>
+				<form class="navbar-form navbar-left" role="search">
+					<div class="form-group">
+						<input type="text" class="form-control" placeholder="Search">
+					</div>
+					<button type="submit" class="btn btn-default">Submit</button>
+				</form>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#">Link</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="#">Action</a></li>
+							<li><a href="#">Another action</a></li>
+							<li><a href="#">Something else here</a></li>
+							<li class="divider"></li>
+							<li><a href="#">Separated link</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+	<div class="AcContainer" ng-model="RightContent">
+		{RightContent}
+	</div>
+	<div class="AcLeftNavigation">
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+		a<br />
+	</div>
 </body>
 </html>

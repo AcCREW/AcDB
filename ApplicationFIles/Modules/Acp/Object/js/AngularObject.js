@@ -3,6 +3,7 @@
 /* Controllers */
 
 AcGenerator.controller('Object', function ($scope, $http) {
+    $scope.ObjectID = null;
     $scope.ObjectText = "New Object";
     $scope.ObjectName = "NewObject";
     $scope.ObjectTableName = "";
@@ -42,6 +43,7 @@ AcGenerator.controller('Object', function ($scope, $http) {
     $scope.Save = function () {
         var sURL = '/AcGenerator/Generator.php';
         var vData = {
+            ObjectID: $scope.ObjectID, 
             Fields: $scope.Fields, 
             ObjectName: $scope.ObjectName,
             ObjectTableName: $scope.ObjectTableName,

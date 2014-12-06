@@ -8,20 +8,23 @@ class Application {
     static $Class = array();
     static $JSON = array();
     static $_this = null;
+    static $Title = null;
     
-    private $PreloadedJSs = array();
+    private $PreloadedJSs = null;
     private $PreloadedCSSs = array();
+    
+    protected $IsJSON = false;
 
     public function Application() {
         self::$_this = &$this;
         $this->Initialize();
+        $this->InitializeAction();
     }
 
     public function &__get($sName) {
         if(isset(self::$Class[$sName])) {
             return self::$Class[$sName];
         }
-
         return self::LoadLibrary($sName);
     }
 
@@ -36,9 +39,11 @@ class Application {
         #endregion
         
         #region - Load Template - 
-        $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
-        $sTemplateDir =  '../Templates/'.$sTemplate;
-        $TemplateInfo = self::LoadJSON($sTemplate, TEMPLATES);
+        if(!$this->IsJSON) {
+            $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
+            $sTemplateDir =  '../Templates/'.$sTemplate;
+            $TemplateInfo = self::LoadJSON($sTemplate, TEMPLATES);
+        }
         #endregion
         
         #region - Load Module -
@@ -50,15 +55,25 @@ class Application {
         #endregion
         
         #region - Parsing Data to Template -
+        $sContent = call_user_func_array(array(&$Module, $sFunction), array());
         $arData = array();
-        $arData['RightContent'] = call_user_func_array(array(&$Module, $sFunction), array());
-        $arData['PreloadedJS'] = $this->PreloadedJSs;
-        $arData['PreloadedCSS'] = $this->PreloadedCSSs;
-        echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
+        $arData['ModuleTitle'] = Application::$Title;
+        $arData['SiteTitle'] = Application::GetConfig('site_title');
+        if($this->IsJSON) {
+            $arData['Content'] = $sContent;
+            header('Content-Type: application/json');
+            echo json_encode($arData);
+        } else {
+            $arData['RightContent'] = $sContent;
+            $arData['PreloadedJS'] = json_encode($this->PreloadedJSs);
+            $arData['PreloadedCSS'] = $this->PreloadedCSSs;
+            echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
+        }
         #endregion
     }
 
     private function Initialize() {
+        $this->PreloadedJSs = new stdClass();
         $arAutoloadLibraries = array_unique(self::GetConfig('autoload_libraries'));
 
         $arNotNeeded = array('Check', 'Utf8', 'Controller');
@@ -74,6 +89,15 @@ class Application {
         }
         foreach(self::GetConfig('autoload_helpers') as $sHelperName) {
             self::LoadHelper($sHelperName);
+        }
+    }
+    
+    private function InitializeAction() {
+        $nAction = $this->Input->get('Action');
+        if($nAction !== false) {
+            if($nAction == ACTION_AJAX_LOAD) {
+                $this->IsJSON = true;
+            }
         }
     }
 
@@ -111,19 +135,20 @@ class Application {
             show_error("The ".$sString." '".$sName."' is not enabled.");
         }
         if(property_exists($Object, 'AngularJSIncluded') && $Object->AngularJSIncluded) {
-            self::$_this->LoadJS(ACPATH.$sDir.JS.DIRECTORY_SEPARATOR.'Angular'.$sName.'.'.JS);
+            self::$_this->LoadJS('Angular'.$sName, ACPATH.$sDir.JS.DIRECTORY_SEPARATOR.'Angular'.$sName);
         }
         foreach($Object->CSS as $sLink) {
             self::$_this->LoadCSS(ACPATH.$sDir.$sLink);
         }
-        foreach($Object->JS as $sLink) {
-            self::$_this->LoadJS(ACPATH.$sDir.$sLink);
+        foreach($Object->JS as $sKey => $sLink) {
+            self::$_this->LoadJS($sKey, ACPATH.$sDir.$sLink);
         }
         $Object->Dir = $sDir;
         if(!is_null($Module)) {
             foreach (get_object_vars($Object) as $sKey => $vValue) {
                 $Module->$sKey = $vValue;
             }
+            Application::$Title = $Object->Module;
         }
         return $Object; 
     }
@@ -188,16 +213,12 @@ class Application {
         return self::$Config[$sKey];
     }
     
-    public function LoadJS($vLink = null) {
-        if(empty($vLink)) {
+    public function LoadJS($sKey, $sLink) {
+        if(empty($sLink) || empty($sKey)) {
             return false;
         }
         
-        if(!is_array($vLink)) {
-            $vLink = array('Link' => $vLink);
-        }
-        
-        $this->PreloadedJSs = array_merge($this->PreloadedJSs, array($vLink));
+        $this->PreloadedJSs->$sKey = $sLink;
     }
     
     public function LoadCSS($vLink = null) {

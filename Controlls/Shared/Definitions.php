@@ -6,6 +6,8 @@ $sApplicationFiles = 'ApplicationFiles';
 
 $sSystemPath = 'Controlls/System';
 
+define('ACTION_AJAX_LOAD', 1000);
+
 define('DEFAULT_CONTROLLER', 'Index');
 define('DEFAULT_FUNCTION', 'Render');
 define('DEFAULT_TEMPLATE', 'Default');

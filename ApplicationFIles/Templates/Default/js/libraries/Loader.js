@@ -12,7 +12,7 @@
         curStage: 0,
         Init: function (message) {
             this.options.message = typeof message === 'undefined' ? 'Loading...' : message;
-            document.body.innerHTML += '<div id="AcLoading"><div id="AcLoaderBar"><div id="AcLoaderBarFill"></div></div><div id="AcLoader"><div id="AcLoaderSpin"><i class="fa fa-cog fa-spin"></i><br /></div><div id="AcLoaderMessage">' + this.message + '</i><br /></div></div></div>';
+            $('#body').append('<div id="AcLoading"><div id="AcLoaderBar"><div id="AcLoaderBarFill"></div></div><div id="AcLoader"><div id="AcLoaderSpin"><i class="fa fa-cog fa-spin"></i><br /></div><div id="AcLoaderMessage">' + this.message + '</i><br /></div></div></div>');
             this.element = document.getElementById("AcLoading");
             this.messageElement = document.getElementById("AcLoaderMessage");
             this.progressBarElement = $("#AcLoaderBarFill");
@@ -84,7 +84,7 @@
             if (animate) {
                 this.progressBarElement.animate({
                     width: dWidth + "%",
-                }, 400, function () {
+                }, 100, function () {
                     if (stage >= Loader.stages) {
                         Loader.Hide();
                     }

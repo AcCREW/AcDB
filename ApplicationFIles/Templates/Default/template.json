@@ -1,17 +1,25 @@
 ﻿{
-   "Author": "Ac0",
-   "Enabled": true,
-   "CSS": [
-      "css/metro-bootstrap.min.css",
-      "css/metro-bootstrap-responsive.min.css",
-      "css/font-awesome.min.css",
-      "css/template.css"
-   ],
-   "JS": [
-      "js/jquery/jquery.js",
-      "js/jquery/jquery.widget.js",
-      "js/angular.min.js",
-      "js/metro/metro.min.js",
-      "js/common.js"
-   ]
+    "Author": "Ac0",
+    "Enabled": true,
+    "CSS": [
+        "css/bootstrap/bootstrap.min.css",
+        "css/bootstrap/bootstrap-theme.min.css",
+        "css/template.css"
+    ],
+    "JS": {
+        "jquery": "js/jquery/jquery",
+        "bootstrap": "js/bootstrap/bootstrap.min",
+        "angular": "js/angular/angular.min",
+        "ocLazyLoad": "js/angular/ocLazyLoad",
+        "AcGenerator": "js/angular/AcGenerator",
+        "common": "js/libraries/common",
+        "loader": "js/libraries/Loader"
+    },
+    "JSSchemes": {
+        "bootstrap": [ "jquery" ],
+        "angular": [ "jquery", "bootstrap" ],
+        "ocLazyLoad": [ "angular" ],
+        "AcGenerator": [ "ocLazyLoad" ],
+        "AngularIndex": [ ]
+    }
 }

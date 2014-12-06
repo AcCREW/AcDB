@@ -1,11 +1,57 @@
-.right_content {
-    width: 100%;
-    padding: 10px;
+.xdebug-error .xe-warning {
+	z-index: 999;
+}
+body {
+	margin-top: 50px;
+	margin-left: 200px;
+	padding-top: 50px;
+    background-color: #edf1f2;
 }
 
-.fa {
-    padding-right: 6px;
+.AcHeader {
+    height: 50px;
+    width: 100%;
+    background-color: #1199c4;
 }
+
+.AcContainer {
+    width: auto;
+    background-color: #edf1f2;
+}
+
+.AcLeftNavigation {
+	overflow:visible	;
+    background-color: #dde6e9;
+    width: 200px;
+    left: 0;
+    top: 0px;
+    position: absolute;
+	min-height: 100%;
+	padding-top: 50px;
+}
+
+.navbar {
+    border: 0 !important;
+}
+
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .active > a {
+    background-image: none;
+    filter: 0;
+    -webkit-box-shadow: 0;
+    box-shadow: 0;
+}
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .active > a {
+    /* -webkit-box-shadow: inset 0 3px 9px rgba(0,0,0,0.075); */
+    /* box-shadow: inset 0 3px 9px rgba(0,0,0,0.075); */
+}
+
+.navbar-default {
+    background-image: none;
+    filter: 0;
+    -webkit-box-shadow: 0;
+    box-shadow: 0;
+}
+
 .clear {
     clear: both;
     display: block;
@@ -29,7 +75,7 @@
     z-index: 1000;
     width: 100%;
     min-height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(50, 50, 50, 0.66);
     color: #ffffff;
 }
 

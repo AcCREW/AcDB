@@ -2,9 +2,9 @@
    "Module": "Index",
    "Author": "Ac0",
    "Enabled": true,
+   "AngularJSIncluded": true,
    "CSS": [
    ],
    "JS": [
-      "js/AngularIndex.js"
    ]
 }
