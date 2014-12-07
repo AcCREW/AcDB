@@ -1,4 +1,4 @@
-<fieldset ng-controller="{Module}">
+<fieldset ng-controller="AngularObjectController">
     <legend>{{ObjectText}}</legend>
     <div class="tab-control" data-role="tab-control">
         <ul class="tabs">

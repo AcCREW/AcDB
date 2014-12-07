@@ -11,6 +11,7 @@ class Application {
     static $Title = null;
     
     private $PreloadedJSs = null;
+    private $PreloadedJSSchemes = null;
     private $PreloadedCSSs = array();
     
     protected $IsJSON = false;
@@ -66,6 +67,7 @@ class Application {
         } else {
             $arData['RightContent'] = $sContent;
             $arData['PreloadedJS'] = json_encode($this->PreloadedJSs);
+            $arData['PreloadedJSScheme'] = json_encode($this->PreloadedJSSchemes);
             $arData['PreloadedCSS'] = $this->PreloadedCSSs;
             echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
         }
@@ -74,6 +76,7 @@ class Application {
 
     private function Initialize() {
         $this->PreloadedJSs = new stdClass();
+        $this->PreloadedJSSchemes = new stdClass();
         $arAutoloadLibraries = array_unique(self::GetConfig('autoload_libraries'));
 
         $arNotNeeded = array('Check', 'Utf8', 'Controller');
@@ -136,19 +139,31 @@ class Application {
         }
         if(property_exists($Object, 'AngularJSIncluded') && $Object->AngularJSIncluded) {
             self::$_this->LoadJS('Angular'.$sName, ACPATH.$sDir.JS.DIRECTORY_SEPARATOR.'Angular'.$sName);
+            self::$_this->LoadJSScheme('Angular'.$sName, array());
         }
-        foreach($Object->CSS as $sLink) {
-            self::$_this->LoadCSS(ACPATH.$sDir.$sLink);
+        if(property_exists($Object, 'CSS')) {
+            foreach($Object->CSS as $sLink) {
+                self::$_this->LoadCSS(ACPATH.$sDir.$sLink);
+            }
         }
-        foreach($Object->JS as $sKey => $sLink) {
-            self::$_this->LoadJS($sKey, ACPATH.$sDir.$sLink);
+        if(property_exists($Object, 'JS')) {
+            foreach($Object->JS as $sKey => $sLink) {
+                self::$_this->LoadJS($sKey, ACPATH.$sDir.$sLink);
+            }
+        }
+        if(property_exists($Object, 'JSSchemes')) {
+            foreach($Object->JSSchemes as $sKey => $sLink) {
+                self::$_this->LoadJSScheme($sKey, $sLink);
+            }
         }
         $Object->Dir = $sDir;
         if(!is_null($Module)) {
             foreach (get_object_vars($Object) as $sKey => $vValue) {
                 $Module->$sKey = $vValue;
             }
-            Application::$Title = $Object->Module;
+            if(property_exists($Object, 'Module')) {
+                Application::$Title = $Object->Module;
+            }
         }
         return $Object; 
     }
@@ -219,6 +234,14 @@ class Application {
         }
         
         $this->PreloadedJSs->$sKey = $sLink;
+    }
+    
+    public function LoadJSScheme($sKey, $sLink) {
+        if(empty($sKey)) {
+            return false;
+        }
+        
+        $this->PreloadedJSSchemes->$sKey = $sLink;
     }
     
     public function LoadCSS($vLink = null) {

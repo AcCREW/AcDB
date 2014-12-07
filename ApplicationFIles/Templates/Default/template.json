@@ -19,7 +19,6 @@
         "bootstrap": [ "jquery" ],
         "angular": [ "jquery", "bootstrap" ],
         "ocLazyLoad": [ "angular" ],
-        "AcGenerator": [ "ocLazyLoad" ],
-        "AngularIndex": [ ]
+        "AcGenerator": [ "ocLazyLoad" ]
     }
 }

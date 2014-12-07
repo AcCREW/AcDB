@@ -13,13 +13,8 @@
 	    requirejs.config({
 	        baseUrl: 'js/',
 	        paths: {PreloadedJS},
-	        shim: {
-	            'bootstrap': ['jquery'],
-	            'angular': ['jquery', 'bootstrap'],
-	            'ocLazyLoad': ['angular'],
-	            'AcGenerator': ['ocLazyLoad'],
-	            'AngularIndex': []
-	        }
+	        shim: {PreloadedJSScheme}
+            
 	    });
 
 	    requirejs(['AcGenerator'], function () {
@@ -44,8 +39,8 @@
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
-					<li><a href="#">Link <span class="sr-only">(current)</span></a></li>
-					<li><a href="#">Link</a></li>
+					<li><a href="#" ng-click="load();">Index<span class="sr-only">(current)</span></a></li>
+					<li><a href="#" ng-click="load2();">Object</a></li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
@@ -83,8 +78,7 @@
 		</div>
 		<!-- /.container-fluid -->
 	</nav>
-	<div class="AcContainer" ng-model="RightContent">
-		{RightContent}
+	<div class="AcContainer" compile="RightContent">
 	</div>
 	<div class="AcLeftNavigation">
 		a<br />

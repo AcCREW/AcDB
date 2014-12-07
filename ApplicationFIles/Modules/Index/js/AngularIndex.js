@@ -2,6 +2,8 @@
 
 /* Controllers */
 
-AcGenerator.controller('Index', function ($scope, $http) {
-    $scope.Text = "Index";
+angular.module('AngularIndex', [])
+	.controller('AngularIndexController', function ($scope, $http) {
+		$scope.Text = "AngularIndex";
+		$scope.ObjectText = "AngularIndex";
 });

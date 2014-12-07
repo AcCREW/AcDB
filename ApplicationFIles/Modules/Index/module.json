@@ -1,10 +1,13 @@
 ﻿{
-   "Module": "Index",
-   "Author": "Ac0",
-   "Enabled": true,
-   "AngularJSIncluded": true,
-   "CSS": [
-   ],
-   "JS": [
-   ]
+    "Module": "Index",
+    "Author": "Ac0",
+    "Enabled": true,
+    "AngularJSIncluded": true,
+    "CSS": [
+    ],
+    "JS": { 
+    },
+    "JSSchemes": {
+    }
+
 }
