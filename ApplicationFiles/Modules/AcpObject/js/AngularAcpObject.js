@@ -12,7 +12,7 @@ angular.module('AngularAcpObject', ['ui.bootstrap'])
 	            'Fields': [{ "Name": "ObjectID", "Type": "", "ShowObjectPicker": "hide", "Object": "", "ShowAdvancedOptions": "hide", "Decimals": "2" }]
 	        };
 	    }
-        
+
 	    $scope.this = userService.AngularAcpObject;
 
 	    $scope.$watch('this.ObjectName', function (newValue, oldValue) {

@@ -48,15 +48,18 @@ class Application {
         #endregion
         
         #region - Load Module -
-        $Module = self::LoadModule($sModulePath);
-        if(!method_exists($Module, $sFunction)) {
-            show_error("Function '".$sFunction."' doesn't exists in class '".$sModulePath."'.");
+        $sContent = '';
+        if($this->IsJSON) {
+            $Module = self::LoadModule($sModulePath);
+            if(!method_exists($Module, $sFunction)) {
+                show_error("Function '".$sFunction."' doesn't exists in class '".$sModulePath."'.");
+            }
+            $ModuleInfo = self::LoadJSON($sModulePath, MODULES, $Module);
+            $sContent = call_user_func_array(array(&$Module, $sFunction), array());
         }
-        $ModuleInfo = self::LoadJSON($sModulePath, MODULES, $Module);
         #endregion
         
         #region - Parsing Data to Template -
-        $sContent = call_user_func_array(array(&$Module, $sFunction), array());
         $arData = array();
         $arData['ModuleTitle'] = Application::$Title;
         $arData['SiteTitle'] = Application::GetConfig('site_title');

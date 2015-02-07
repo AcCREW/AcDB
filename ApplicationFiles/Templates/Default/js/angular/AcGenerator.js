@@ -25,7 +25,7 @@
 }]).controller('AcController', ['$scope', '$ocLazyLoad', '$http', 'ngProgress', function ($scope, $ocLazyLoad, $http, ngProgress) {
     $scope.RightContent = "";
     $scope.arHTMLCache = Array();
-    $scope.CurrentModule = "";
+    $scope.CurrentModule = "Index";
 
     $scope.Request = function (sURL, vData) {
         var request = $http({
@@ -50,15 +50,15 @@
         if (sNewModule == "") {
             return;
         }
-        if (sOldModule != "") {
-            $scope.arHTMLCache[sOldModule] = $scope.RightContent;
-        }
+        
         if ($scope.arHTMLCache[sNewModule] !== undefined) {
             $ocLazyLoad.load({
                 name: 'Angular' + sNewModule,
                 files: ['../ApplicationFiles/Modules/' + sNewModule + '/js/Angular' + sNewModule]
             }).then(function () {
-                $scope.RightContent = $scope.arHTMLCache[sNewModule];
+                var _Data = $scope.arHTMLCache[sNewModule];
+                $scope.RightContent = _Data.Content;
+                document.title = _Data.SiteTitle + ' - ' + _Data.ModuleTitle;
             }, function (e) {
                 console.log(e);
             });
@@ -67,13 +67,14 @@
         }
 
         ngProgress.reset().start();
-        $scope.Request(BaseURL + 'index.php', { "Module": sNewModule, "Action": 1000 }).then(function (data) {
+        $scope.Request(BaseURL + 'index.php', { "Module": sNewModule, "Action": 1000 }).then(function (_Data) {
             $ocLazyLoad.load({
                 name: 'Angular' + sNewModule,
                 files: ['../ApplicationFiles/Modules/' + sNewModule + '/js/Angular' + sNewModule]
             }).then(function () {
-                $scope.RightContent = data.Content;
-                $scope.arHTMLCache[sNewModule] = data.Content;
+                $scope.RightContent = _Data.Content;
+                $scope.arHTMLCache[sNewModule] = _Data;
+                document.title = _Data.SiteTitle + ' - ' + _Data.ModuleTitle;
                 ngProgress.complete();
             }, function (e) {
                 ngProgress.complete();
