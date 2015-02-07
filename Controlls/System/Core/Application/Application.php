@@ -32,11 +32,11 @@ class Application {
     public function Start() {
         #region - Fetching Module & Function
         $sModulePath = $this->Input->get('Module');
-        $sModulePath = ucfirst(strtolower($sModulePath !== false ? $sModulePath : DEFAULT_CONTROLLER));
+        $sModulePath = $sModulePath !== false ? $sModulePath : DEFAULT_CONTROLLER;
         $arModule = explode('/', $sModulePath);
         $sModule = ucfirst(end($arModule));
         $sFunction = $this->Input->get('Function');
-        $sFunction = ucfirst(strtolower($sFunction !== false ? $sFunction : DEFAULT_FUNCTION));
+        $sFunction = $sFunction !== false ? $sFunction : DEFAULT_FUNCTION;
         #endregion
         
         #region - Load Template - 
@@ -123,11 +123,11 @@ class Application {
             return self::$JSON[$sName];
         }
         if($sType == MODULES) {
-            $sDir = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sNamePath.DIRECTORY_SEPARATOR;
+            $sDir = APPPATH.MODULES.'/'.$sNamePath.'/';
             $sPath = $sDir.MODULE_JSON;
             $sString = 'module';
         } elseif($sType == TEMPLATES) {
-            $sDir = APPPATH.TEMPLATES.DIRECTORY_SEPARATOR.$sNamePath.DIRECTORY_SEPARATOR;
+            $sDir = APPPATH.TEMPLATES.'/'.$sNamePath.'/';
             $sPath = $sDir.TEMPLATE_JSON;
             $sString = 'template';
         } else {
@@ -138,7 +138,7 @@ class Application {
             show_error("The ".$sString." '".$sName."' is not enabled.");
         }
         if(property_exists($Object, 'AngularJSIncluded') && $Object->AngularJSIncluded) {
-            self::$_this->LoadJS('Angular'.$sName, ACPATH.$sDir.JS.DIRECTORY_SEPARATOR.'Angular'.$sName);
+            self::$_this->LoadJS('Angular'.$sName, ACPATH.$sDir.JS.'/'.'Angular'.$sName);
             self::$_this->LoadJSScheme('Angular'.$sName, array());
         }
         if(property_exists($Object, 'CSS')) {
@@ -169,7 +169,7 @@ class Application {
     }
     
     public static function LoadTemplate($sName, $sModule) {
-        $sFile = APPPATH.MODULES.DIRECTORY_SEPARATOR.$sModule.DIRECTORY_SEPARATOR.VIEWS.DIRECTORY_SEPARATOR.$sName.EXT;
+        $sFile = APPPATH.MODULES.'/'.$sModule.'/'.VIEWS.'/'.$sName.EXT;
         
         return self::LoadFile($sFile);
     }
@@ -188,14 +188,14 @@ class Application {
     
     public static function Load($sNamePath, $sType = LIBRARIES, $bInitializeClass = true) {
         $arName = explode('/', $sNamePath);
-        $sName = ucfirst(end($arName));
+        $sName = end($arName);
         if($sType == LIBRARIES && isset(self::$Class[$sName])) {
             return self::$Class[$sName];
         }
         if($sType == MODULES) {
-            $sFile = APPPATH.$sType.DIRECTORY_SEPARATOR.$sNamePath.DIRECTORY_SEPARATOR.$sName.EXT;
+            $sFile = APPPATH.$sType.'/'.$sNamePath.'/'.$sName.EXT;
         } else {
-            $sFile = SYSDIR.$sType.DIRECTORY_SEPARATOR.$sNamePath.EXT;
+            $sFile = SYSDIR.$sType.'/'.$sNamePath.EXT;
         }
         
         self::LoadFile($sFile, true);

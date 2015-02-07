@@ -1,5 +1,5 @@
 ﻿{
-   "Module": "Object",
+   "Module": "AcpObject",
    "Author": "Ac0",
    "Enabled": true,
    "AngularJSIncluded": true,

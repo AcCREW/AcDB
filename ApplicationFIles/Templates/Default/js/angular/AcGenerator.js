@@ -1,80 +1,86 @@
-﻿angular.module('AcGenerator', ['oc.lazyLoad'], function ($compileProvider) {
-	$compileProvider.directive('compile', function ($compile) {
-		return function (scope, element, attrs) {
-			scope.$watch(
+﻿angular.module('AcGenerator', ['oc.lazyLoad', 'ngProgress'], function ($compileProvider) {
+    $compileProvider.directive('compile', function ($compile) {
+        return function (scope, element, attrs) {
+            scope.$watch(
 			  function (scope) {
-			  	return scope.$eval(attrs.compile);
+			      return scope.$eval(attrs.compile);
 			  },
 			  function (value) {
-			  	element.html(value);
-			  	$compile(element.contents())(scope);
+			      element.html(value);
+			      $compile(element.contents())(scope);
 			  }
 			);
-		};
-	});
+        };
+    });
+}).factory('userService', function () {
+    var _UserService = {};
+
+    return _UserService;
 }).config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
-	$ocLazyLoadProvider.config({
-		loadedModules: [],
-		jsLoader: requirejs,
-		debug: true
-	});
-}]).controller('AcController', ['$scope', '$ocLazyLoad', '$http', function ($scope, $ocLazyLoad, $http) {
-	$scope.RightContent = "";
+    $ocLazyLoadProvider.config({
+        loadedModules: [],
+        jsLoader: requirejs,
+        debug: false
+    });
+}]).controller('AcController', ['$scope', '$ocLazyLoad', '$http', 'ngProgress', function ($scope, $ocLazyLoad, $http, ngProgress) {
+    $scope.RightContent = "";
+    $scope.arHTMLCache = Array();
+    $scope.CurrentModule = "";
 
-	$scope.Request = function (sURL, vData) {
-		var request = $http({
-			method: 'GET',
-			url: sURL,
-			params: vData,
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-		});
+    $scope.Request = function (sURL, vData) {
+        var request = $http({
+            method: 'GET',
+            url: sURL,
+            params: vData,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
 
-		return (request.then(function (response) { return response.data }, function (response) { return new Error(response.statusText, response.status); }));
-	}
+        return (request.then(function (response) { return response.data }, function (response) { return new Error(response.statusText, response.status); }));
+    }
 
-	$scope.load = function () {
-		var sURL = BaseURL + 'index.php';
-		var vData = {
-			"Module": "Index",
-			"Action": 1000
-		};
-		$scope.Request(sURL, vData).then(function (data) {
-		$ocLazyLoad.load({
-			name: 'AngularIndex',
-			files: ['AngularIndex']
-		}).then(function () {
-			$scope.RightContent = data.Content;
-		}, function (e) {
-			console.log(e);
-		});
+    $scope.$watch('CurrentModule', function (sNewModule, sOldModule) {
+        $scope._Load(sNewModule, sOldModule);
+    });
 
-		}, function (Error) {
-			console.log(Error);
-		});
+    $scope.GoTo = function (sModule) {
+        $scope.CurrentModule = sModule;
+    }
 
+    $scope._Load = function (sNewModule, sOldModule) {
+        if (sNewModule == "") {
+            return;
+        }
+        if (sOldModule != "") {
+            $scope.arHTMLCache[sOldModule] = $scope.RightContent;
+        }
+        if ($scope.arHTMLCache[sNewModule] !== undefined) {
+            $ocLazyLoad.load({
+                name: 'Angular' + sNewModule,
+                files: ['../ApplicationFiles/Modules/' + sNewModule + '/js/Angular' + sNewModule]
+            }).then(function () {
+                $scope.RightContent = $scope.arHTMLCache[sNewModule];
+            }, function (e) {
+                console.log(e);
+            });
 
-	}
+            return;
+        }
 
-	$scope.load2 = function () {
-		var sURL = BaseURL + 'index.php';
-		var vData = {
-			"Module": "Acp/Object",
-			"Action": 1000
-		};
-		$scope.Request(sURL, vData).then(function (data) {
-			$ocLazyLoad.load({
-				name: 'AngularObject',
-				files: ['../ApplicationFiles/Modules/Acp/Object/js/AngularObject']
-			}).then(function () {
-				$scope.RightContent = data.Content;
-			}, function (e) {
-				console.log(e);
-			});
-
-		}, function (Error) {
-			console.log(Error);
-		});
-
-
-	}
+        ngProgress.reset().start();
+        $scope.Request(BaseURL + 'index.php', { "Module": sNewModule, "Action": 1000 }).then(function (data) {
+            $ocLazyLoad.load({
+                name: 'Angular' + sNewModule,
+                files: ['../ApplicationFiles/Modules/' + sNewModule + '/js/Angular' + sNewModule]
+            }).then(function () {
+                $scope.RightContent = data.Content;
+                $scope.arHTMLCache[sNewModule] = data.Content;
+                ngProgress.complete();
+            }, function (e) {
+                ngProgress.complete();
+                console.log(e);
+            });
+        }, function (Error) {
+            console.log(Error);
+        });
+    }
 }]);

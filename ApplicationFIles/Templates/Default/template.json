@@ -3,22 +3,26 @@
     "Enabled": true,
     "CSS": [
         "css/bootstrap/bootstrap.min.css",
-        "css/bootstrap/bootstrap-theme.min.css",
-        "css/template.css"
+        "css/template.css",
+        "css/nprogress.css"
     ],
     "JS": {
+        "common": "js/libraries/common",
         "jquery": "js/jquery/jquery",
         "bootstrap": "js/bootstrap/bootstrap.min",
+        "angularBootstrap": "js/bootstrap/ui-bootstrap-tpls-0.12.0.min",
         "angular": "js/angular/angular.min",
         "ocLazyLoad": "js/angular/ocLazyLoad",
         "AcGenerator": "js/angular/AcGenerator",
-        "common": "js/libraries/common",
+        "ngProgress": "js/angular/ngProgress",
         "loader": "js/libraries/Loader"
     },
     "JSSchemes": {
-        "bootstrap": [ "jquery" ],
+        "bootstrap": [ "common" ],
         "angular": [ "jquery", "bootstrap" ],
+        "angularBootstrap":  [ "angular" ],
+        "ngProgress": [ "angular" ],
         "ocLazyLoad": [ "angular" ],
-        "AcGenerator": [ "ocLazyLoad" ]
+        "AcGenerator": [ "ngProgress", "ocLazyLoad", "angularBootstrap" ]
     }
 }
