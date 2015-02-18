@@ -52,16 +52,9 @@
         }
         
         if ($scope.arHTMLCache[sNewModule] !== undefined) {
-            $ocLazyLoad.load({
-                name: 'Angular' + sNewModule,
-                files: ['../ApplicationFiles/Modules/' + sNewModule + '/js/Angular' + sNewModule]
-            }).then(function () {
-                var _Data = $scope.arHTMLCache[sNewModule];
-                $scope.RightContent = _Data.Content;
-                document.title = _Data.SiteTitle + ' - ' + _Data.ModuleTitle;
-            }, function (e) {
-                console.log(e);
-            });
+            var _Data = $scope.arHTMLCache[sNewModule];
+            $scope.RightContent = _Data.Content;
+            document.title = _Data.SiteTitle + ' - ' + _Data.ModuleTitle;
 
             return;
         }

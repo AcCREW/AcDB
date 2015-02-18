@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{SiteTitle} - {ModuleTitle}</title>
+    <title>{SiteTitle}</title>
     {PreloadedCSS}<link rel="stylesheet" href="{Link}" />
     {/PreloadedCSS}
     <script type="text/javascript" src="{BaseURL}ApplicationFiles/Templates/Default/js/angular/require.js" charset="UTF8"></script>
@@ -41,6 +41,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="#" ng-click="GoTo('Index');">Index<span class="sr-only">(current)</span></a></li>
                     <li><a href="#" ng-click="GoTo('AcpObject');">Object</a></li>
+                    <li><a href="#" ng-click="GoTo('AcpUpdate');">Update</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">

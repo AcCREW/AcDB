@@ -4,7 +4,7 @@
  * Setting default configs needed.
  */
 
-Application::SetConfig('site_title', 'AcGenerator');
+Application::SetConfig('site_title', 'AcDB');
 Application::SetConfig('template', 'Default');
 Application::SetConfig('autoload_libraries', array('Session', 'Parser'));
 Application::SetConfig('autoload_helpers', array());
