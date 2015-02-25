@@ -1,12 +1,12 @@
 /*!
- * Bootstrap v3.3.1 (http://getbootstrap.com)
- * Copyright 2011-2014 Twitter, Inc.
+ * Bootstrap v3.3.2 (http://getbootstrap.com)
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=58441cfd759dce648e4e)
- * Config saved to config.json and https://gist.github.com/58441cfd759dce648e4e
+ * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=1a7de87abc461ab2f33f)
+ * Config saved to config.json and https://gist.github.com/1a7de87abc461ab2f33f
  */
 .btn-default,
 .btn-primary,
@@ -67,6 +67,7 @@
   background-color: #e0e0e0;
   border-color: #dbdbdb;
 }
+.btn-default.disabled,
 .btn-default:disabled,
 .btn-default[disabled] {
   background-color: #e0e0e0;
@@ -92,6 +93,7 @@
   background-color: #265a88;
   border-color: #245580;
 }
+.btn-primary.disabled,
 .btn-primary:disabled,
 .btn-primary[disabled] {
   background-color: #265a88;
@@ -117,6 +119,7 @@
   background-color: #419641;
   border-color: #3e8f3e;
 }
+.btn-success.disabled,
 .btn-success:disabled,
 .btn-success[disabled] {
   background-color: #419641;
@@ -142,6 +145,7 @@
   background-color: #2aabd2;
   border-color: #28a4c9;
 }
+.btn-info.disabled,
 .btn-info:disabled,
 .btn-info[disabled] {
   background-color: #2aabd2;
@@ -167,6 +171,7 @@
   background-color: #eb9316;
   border-color: #e38d13;
 }
+.btn-warning.disabled,
 .btn-warning:disabled,
 .btn-warning[disabled] {
   background-color: #eb9316;
@@ -192,6 +197,7 @@
   background-color: #c12e2a;
   border-color: #b92c28;
 }
+.btn-danger.disabled,
 .btn-danger:disabled,
 .btn-danger[disabled] {
   background-color: #c12e2a;
@@ -224,12 +230,12 @@
   background-color: #2e6da4;
 }
 .navbar-default {
-  background-image: -webkit-linear-gradient(top, #1dbaeb 0%, #1199c4 100%);
-  background-image: -o-linear-gradient(top, #1dbaeb 0%, #1199c4 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#1dbaeb), to(#1199c4));
-  background-image: linear-gradient(to bottom, #1dbaeb 0%, #1199c4 100%);
+  background-image: -webkit-linear-gradient(top, #fefefe 0%, #e9e4e0 100%);
+  background-image: -o-linear-gradient(top, #fefefe 0%, #e9e4e0 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fefefe), to(#e9e4e0));
+  background-image: linear-gradient(to bottom, #fefefe 0%, #e9e4e0 100%);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff1dbaeb', endColorstr='#ff1199c4', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffefefe', endColorstr='#ffe9e4e0', GradientType=0);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   border-radius: 0px;
   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 5px rgba(0, 0, 0, 0.075);
@@ -237,12 +243,12 @@
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .active > a {
-  background-image: -webkit-linear-gradient(top, #15a0cb 0%, #16abd9 100%);
-  background-image: -o-linear-gradient(top, #15a0cb 0%, #16abd9 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#15a0cb), to(#16abd9));
-  background-image: linear-gradient(to bottom, #15a0cb 0%, #16abd9 100%);
+  background-image: -webkit-linear-gradient(top, #d1c6be 0%, #d7cec7 100%);
+  background-image: -o-linear-gradient(top, #d1c6be 0%, #d7cec7 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#d1c6be), to(#d7cec7));
+  background-image: linear-gradient(to bottom, #d1c6be 0%, #d7cec7 100%);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff15a0cb', endColorstr='#ff16abd9', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd1c6be', endColorstr='#ffd7cec7', GradientType=0);
   -webkit-box-shadow: inset 0 3px 9px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 3px 9px rgba(0, 0, 0, 0.075);
 }

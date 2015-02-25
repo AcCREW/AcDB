@@ -1,5 +1,5 @@
 <div ng-controller="AngularAcpObjectController">
-    <legend>{{this.ObjectText}}</legend>
+    <h2>{{this.ObjectText}}</h2>
     <tabset>
         <tab heading="General">
             <div class="tab_content">

@@ -3,6 +3,8 @@
     "Enabled": true,
     "CSS": [
         "css/bootstrap/bootstrap.min.css",
+        "css/dash.css",
+        "css/font-awesome.min.css",
         "css/template.css",
         "css/nprogress.css"
     ],
@@ -15,10 +17,14 @@
         "ocLazyLoad": "js/angular/ocLazyLoad",
         "AcGenerator": "js/angular/AcGenerator",
         "ngProgress": "js/angular/ngProgress",
+        "dash": "js/libraries/dash",
+        "jquerySwipe":  "js/jquery/jquery.touchSwipe.min",
         "loader": "js/libraries/Loader"
     },
     "JSSchemes": {
-        "bootstrap": [ "common" ],
+        "jquerySwipe": [ "jquery" ],
+        "dash": [ "jquery", "jquerySwipe" ],
+        "bootstrap": [ "common", "dash" ],
         "angular": [ "jquery", "bootstrap" ],
         "angularBootstrap":  [ "angular" ],
         "ngProgress": [ "angular" ],
