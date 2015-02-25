@@ -115,6 +115,6 @@
             padding-bottom: 5px;
         }
 
-        .dash-navbar-top .navbar-nav > li > a:hover, .dash-navbar-top .navbar-nav > li > a:focus {
-            cursor: pointer;
-        }
+.dash-navbar-top .navbar-nav > li > a:hover, .dash-navbar-top .navbar-nav > li > a:focus {
+    cursor: pointer;
+}

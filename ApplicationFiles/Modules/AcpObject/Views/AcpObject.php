@@ -48,7 +48,7 @@
                                     <option value="4">int</option>
                                     <option value="5">datetime</option>
                                     <option value="6">time</option>
-                                </select>                            </div>
+                                </select>                            </div>
                         </div>
                         <div class="row form-group {{Field.ShowObjectPicker}}">
                             <div class="col-md-6">

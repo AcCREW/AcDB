@@ -265,7 +265,7 @@
         </div>
         <!-- /.dash-navbar-left -->
 
-        <div class="content-wrap dnl-hidden" data-effect="dnl-push">
+        <div class="content-wrap dnl-hidden" data-effect="dnl-opacity">
             <div class="container-fluid" compile="RightContent">
             </div>
         </div>

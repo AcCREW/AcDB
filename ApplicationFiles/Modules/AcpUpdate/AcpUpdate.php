@@ -6,6 +6,6 @@ class AcpUpdate extends AcController {
     }
     
     public function Render() {
-        return $this->Parser->Parse('AcpUpdate', 'AcpUpdate', array('Message' => 'Welcome to AcGenerator!', 'Module' => 'Index'));
+        return $this->Parser->Parse('AcpUpdate', 'AcpUpdate', array('Message' => 'Grid!', 'Module' => 'Update'));
     }
 }

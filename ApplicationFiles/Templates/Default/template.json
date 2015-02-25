@@ -6,6 +6,7 @@
         "css/dash.css",
         "css/font-awesome.min.css",
         "css/template.css",
+        "css/ui-grid.min.css",
         "css/nprogress.css"
     ],
     "JS": {
@@ -13,6 +14,7 @@
         "jquery": "js/jquery/jquery",
         "bootstrap": "js/bootstrap/bootstrap.min",
         "angularBootstrap": "js/bootstrap/ui-bootstrap-tpls-0.12.0.min",
+        "angularGrid": "js/angular/ui-grid.min",
         "angular": "js/angular/angular.min",
         "ocLazyLoad": "js/angular/ocLazyLoad",
         "AcGenerator": "js/angular/AcGenerator",
@@ -27,8 +29,9 @@
         "bootstrap": [ "common", "dash" ],
         "angular": [ "jquery", "bootstrap" ],
         "angularBootstrap":  [ "angular" ],
+        "angularGrid":  [ "angular" ],
         "ngProgress": [ "angular" ],
         "ocLazyLoad": [ "angular" ],
-        "AcGenerator": [ "ngProgress", "ocLazyLoad", "angularBootstrap" ]
+        "AcGenerator": [ "ngProgress", "ocLazyLoad", "angularBootstrap", "angularGrid" ]
     }
 }
