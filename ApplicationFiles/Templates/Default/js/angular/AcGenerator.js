@@ -25,7 +25,7 @@
 }]).controller('AcController', ['$scope', '$ocLazyLoad', '$http', 'ngProgress', function ($scope, $ocLazyLoad, $http, ngProgress) {
     $scope.RightContent = "";
     $scope.arHTMLCache = Array();
-    $scope.CurrentModule = "Index";
+    $scope.CurrentModule = "AcpObject"; // defualt Index
 
     $scope.Request = function (sURL, vData) {
         var request = $http({
@@ -39,20 +39,20 @@
     }
 
     $scope.$watch('CurrentModule', function (sNewModule, sOldModule) {
-        $scope._Load(sNewModule, sOldModule);
+        $scope._Load(sNewModule);
     });
 
     $scope.GoTo = function (sModule) {
         $scope.CurrentModule = sModule;
     }
 
-    $scope._Load = function (sNewModule, sOldModule) {
-        if (sNewModule == "") {
+    $scope._Load = function (sModule) {
+        if (sModule == "") {
             return;
         }
         
-        if ($scope.arHTMLCache[sNewModule] !== undefined) {
-            var _Data = $scope.arHTMLCache[sNewModule];
+        if ($scope.arHTMLCache[sModule] !== undefined) {
+            var _Data = $scope.arHTMLCache[sModule];
             $scope.RightContent = _Data.Content;
             document.title = _Data.SiteTitle + ' - ' + _Data.ModuleTitle;
 
@@ -60,13 +60,13 @@
         }
 
         ngProgress.reset().start();
-        $scope.Request(BaseURL + 'index.php', { "Module": sNewModule, "Action": 1000 }).then(function (_Data) {
+        $scope.Request(BaseURL + 'index.php', { "Module": sModule, "Action": 1000 }).then(function (_Data) {
             $ocLazyLoad.load({
-                name: 'Angular' + sNewModule,
-                files: ['../ApplicationFiles/Modules/' + sNewModule + '/js/Angular' + sNewModule]
+                name: 'Angular' + sModule,
+                files: ['../ApplicationFiles/Modules/' + sModule + '/js/Angular' + sModule]
             }).then(function () {
                 $scope.RightContent = _Data.Content;
-                $scope.arHTMLCache[sNewModule] = _Data;
+                $scope.arHTMLCache[sModule] = _Data;
                 document.title = _Data.SiteTitle + ' - ' + _Data.ModuleTitle;
                 ngProgress.complete();
             }, function (e) {
