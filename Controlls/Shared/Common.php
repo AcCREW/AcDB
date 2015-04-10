@@ -1,5 +1,15 @@
 <?php
 
+class Error {
+    public $Message = null;
+    public $Code = null;
+    
+    public function Error($sMessage, $sCode = null) {
+        $this->Message = $sMessage;
+        $this->Code = $sCode;
+    }
+}
+
 /**
  * Remove Invisible Characters
  *
@@ -72,13 +82,12 @@ if (!function_exists('show_error')) {
 }
 if (!function_exists('Dump')) {
 	function Dump($oObject, $bDump = true) {
-        echo '<pre id="dump" style="font-size: 11px; color: #000077; font-weight: normal; text-transform: none; text-align: left;" contenteditable="true"><span style="color:#FF0000; font-weight:bold">&lt;Dump&gt;</span>'."\n";
+        #echo '<pre id="dump" style="font-size: 11px; color: #000077; font-weight: normal; text-transform: none; text-align: left;" contenteditable="true"><span style="color:#FF0000; font-weight:bold">&lt;Dump&gt;</span>'."\n";
         if($bDump){
             var_dump($oObject);
         }else{
             print_r($oObject);
         }
-        echo '<span style="color:#FF0000; font-weight:bold">&lt;/Dump&gt;</span></pre>
-';
+        #echo '<span style="color:#FF0000; font-weight:bold">&lt;/Dump&gt;</span></pre>';
     }
 }

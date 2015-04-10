@@ -2,19 +2,40 @@
 
 require_once("./Controlls/Shared/Definitions.php");
 require_once("./Controlls/Shared/Common.php");
-
+/**
+ * @property Application $_this instance
+ * @property string $Title Module title
+ * @property array $Class Stores all loaded classes
+ * @property array $JSON Stores all loaded JSONs
+ * @property array $Config Stores all configs
+ * @property Controller $Controller Controller Class
+ * @property DB $DB DB Class
+ * @property Encrypt $Encrypt Encrypt Class
+ * @property Generator $Generator Generator Class
+ * @property Check $Check Check Class
+ * @property Input $Input Input Class
+ * @property Parser $Parser Parser Class
+ * @property Security $Security Security Class
+ * @property Session $Session Session Class
+ * @property SHA1 $SHA1 SHA1 Class
+ * @property URI $URI URI Class
+ * @property Utf8 $Utf8 Utf8 Class
+ */
 class Application {
+    const _ACTION_INITIALIZE_ACDB = 0;
+    const _ACTION_LOAD_MODULE = 1000;
+    
     static $Config = array();
     static $Class = array();
     static $JSON = array();
     static $_this = null;
     static $Title = null;
     
+    protected $Action = self::_ACTION_INITIALIZE_ACDB;
+    
     private $PreloadedJSs = null;
     private $PreloadedJSSchemes = null;
     private $PreloadedCSSs = array();
-    
-    protected $IsJSON = false;
 
     public function Application() {
         self::$_this = &$this;
@@ -23,38 +44,40 @@ class Application {
     }
 
     public function &__get($sName) {
-        if(isset(self::$Class[$sName])) {
-            return self::$Class[$sName];
+        if(!isset(self::$Class[$sName])) {
+            self::LoadLibrary($sName);
         }
-        return self::LoadLibrary($sName);
+        
+        return self::$Class[$sName];
     }
 
     public function Start() {
         #region - Fetching Module & Function
         $sModulePath = $this->Input->get('Module');
         $sModulePath = $sModulePath !== false ? $sModulePath : DEFAULT_CONTROLLER;
-        $arModule = explode('/', $sModulePath);
-        $sModule = ucfirst(end($arModule));
+        //$arModule = explode('/', $sModulePath);
+        //$sModule = ucfirst(end($arModule));
         $sFunction = $this->Input->get('Function');
         $sFunction = $sFunction !== false ? $sFunction : DEFAULT_FUNCTION;
         #endregion
         
         #region - Load Template - 
-        if(!$this->IsJSON) {
+        $sTemplateDir = null;
+        if($this->Action == self::_ACTION_INITIALIZE_ACDB) {
             $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
             $sTemplateDir =  '../Templates/'.$sTemplate;
-            $TemplateInfo = self::LoadJSON($sTemplate, TEMPLATES);
+            self::LoadJSON($sTemplate, TEMPLATES);
         }
         #endregion
         
         #region - Load Module -
         $sContent = '';
-        if($this->IsJSON) {
+        if($this->Action == self::_ACTION_LOAD_MODULE) {
             $Module = self::LoadModule($sModulePath);
             if(!method_exists($Module, $sFunction)) {
                 show_error("Function '".$sFunction."' doesn't exists in class '".$sModulePath."'.");
             }
-            $ModuleInfo = self::LoadJSON($sModulePath, MODULES, $Module);
+            self::LoadJSON($sModulePath, MODULES, $Module);
             $sContent = call_user_func_array(array(&$Module, $sFunction), array());
         }
         #endregion
@@ -63,7 +86,7 @@ class Application {
         $arData = array();
         $arData['ModuleTitle'] = Application::$Title;
         $arData['SiteTitle'] = Application::GetConfig('site_title');
-        if($this->IsJSON) {
+        if($this->Action == self::_ACTION_LOAD_MODULE) {
             $arData['Content'] = $sContent;
             header('Content-Type: application/json');
             echo json_encode($arData);
@@ -101,9 +124,7 @@ class Application {
     private function InitializeAction() {
         $nAction = $this->Input->get('Action');
         if($nAction !== false) {
-            if($nAction == ACTION_AJAX_LOAD) {
-                $this->IsJSON = true;
-            }
+            $this->Action = $nAction;    
         }
     }
 
@@ -125,6 +146,9 @@ class Application {
         if(isset(self::$JSON[$sName])) {
             return self::$JSON[$sName];
         }
+        $sPath = null;
+        $sString = null;
+        $sDir = null;
         if($sType == MODULES) {
             $sDir = APPPATH.MODULES.'/'.$sNamePath.'/';
             $sPath = $sDir.MODULE_JSON;
@@ -184,6 +208,7 @@ class Application {
         
         if($bRequre) {
             require_once($sFile);
+            return true;
         } else {
             return file_get_contents($sFile);
         }
@@ -215,6 +240,8 @@ class Application {
                 return true;
             }
         }
+        
+        return true;
     }
 
     public static function SetConfig($sKey, $vValue) {
@@ -237,6 +264,7 @@ class Application {
         }
         
         $this->PreloadedJSs->$sKey = $sLink;
+        return true;
     }
     
     public function LoadJSScheme($sKey, $sLink) {
@@ -245,6 +273,7 @@ class Application {
         }
         
         $this->PreloadedJSSchemes->$sKey = $sLink;
+        return true;
     }
     
     public function LoadCSS($vLink = null) {
@@ -257,7 +286,14 @@ class Application {
         }
         
         $this->PreloadedCSSs = array_merge($this->PreloadedCSSs, array($vLink));
+        return true;
     }
 }
 
 require_once(APPPATH."Config/Config.php");
+
+
+function AcAutoLoader($sClass) {
+    Application::LoadLibrary($sClass);
+}
+spl_autoload_register('AcAutoLoader');

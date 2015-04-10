@@ -5,11 +5,11 @@
  *
  * @author Венцислав Кьоровски
  */
-class AcCheck {
+class Check {
     private $MarkedTimes = array();
     private $MarkedMemories = array();
     
-    public function AcCheck() {
+    public function Check() {
         global $nAppStartTime, $nAppStartMemory;
         $this->MarkTime(APP_START, $nAppStartTime);
         $this->MarkMemory(APP_START, $nAppStartMemory);

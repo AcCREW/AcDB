@@ -1,5 +1,5 @@
 <?php
-class AcEncrypt {
+class Encrypt {
     
 	var $encryption_key	= '';
 	var $_hash_type	= 'sha1';

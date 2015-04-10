@@ -24,7 +24,7 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/libraries/parser.html
  */
-class AcParser {
+class Parser {
 
 	var $l_delim = '{';
 	var $r_delim = '}';

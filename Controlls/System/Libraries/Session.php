@@ -1,5 +1,5 @@
 <?php 
-class AcSession {
+class Session {
 
     var $sess_use_database          = false; //TRUE STILL NOT SUPPORTED
 	var $sess_encrypt_cookie		= false;
@@ -60,7 +60,7 @@ class AcSession {
 		// Set the cookie name
 		$this->sess_cookie_name = $this->cookie_prefix.$this->sess_cookie_name;
         
-        $this->input = Application::LoadLibrary('Input');
+        $this->input = Application::$_this->Input;
 
 		// Run the Session routine. If a session doesn't exist we'll
 		// create a new one.  If it does, we'll update it.
@@ -198,6 +198,7 @@ class AcSession {
 
 		// Session is valid!
 		$this->userdata = $session;
+        #Dump($session, false);
 		unset($session);
 
 		return true;

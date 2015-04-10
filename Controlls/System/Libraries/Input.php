@@ -26,7 +26,7 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/libraries/input.html
  */
-class AcInput {
+class Input {
 
 	/**
 	 * IP address of the current user
@@ -88,11 +88,11 @@ class AcInput {
 		$this->_enable_xss		= (Application::GetConfig('global_xss_filtering') === true);
 		$this->_enable_csrf		= (Application::GetConfig('csrf_protection') === true);
 
-		$this->security = Application::LoadLibrary('Security');
+		$this->security = Application::$_this->Security;
         
 		// Do we need the UTF-8 class?
 		if (UTF8_ENABLED === true) {
-			$this->uni = Application::LoadLibrary('Utf8');
+			$this->uni = Application::$_this->Utf8;
 		}
 
 		// Sanitize global arrays

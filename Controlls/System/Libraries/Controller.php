@@ -5,7 +5,7 @@
  *
  * @author Венцислав Кьоровски
  */
-class AcController extends stdClass{
+class Controller extends stdClass{
    
     public function __construct() {
         foreach(array_keys(Application::$Class) as $sClassName) {

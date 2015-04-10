@@ -1,6 +1,6 @@
 <?php
 
-class AcpObject extends AcController {
+class AcpObject extends Controller {
     public function Object() {
         parent::__construct();
     }

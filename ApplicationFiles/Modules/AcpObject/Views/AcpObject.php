@@ -25,14 +25,14 @@
                             <input type="text" ng-model="_this.ObjectTableName" class="form-control">
                         </div>
                         <div class="col-md-6">
-                            <label>Default Object Method</label>
-                            <select class="form-control" ng-model="_this.DefaultObjectMethod" ng-options="DefaultObjectMethodOption.text disable when DefaultObjectMethodOption.disable for DefaultObjectMethodOption in _this.DefaultObjectMethodOptions"></select>  
+                            <label>Has Business Logic</label>
+                            <select class="form-control" ng-model="_this.HasBusinessLogic" ng-options="HasBusinessLogicOption.text disable when HasBusinessLogicOption.disable for HasBusinessLogicOption in _this.HasBusinessLogicOptions"></select>  
                         </div>
                     </div>
                     <div class="row form-group">
                         <div class="col-md-6">
-                            <label>Has Business Logic</label>
-                            <select class="form-control" ng-model="_this.HasBusinessLogic" ng-options="HasBusinessLogicOption.text disable when HasBusinessLogicOption.disable for HasBusinessLogicOption in _this.HasBusinessLogicOptions"></select>  
+                            <label>Default Object Method</label>
+                            <select class="form-control" ng-model="_this.DefaultObjectMethod" ng-options="DefaultObjectMethodOption.text disable when DefaultObjectMethodOption.disable for DefaultObjectMethodOption in _this.DefaultObjectMethodOptions"></select>  
                         </div>
                         <div class="col-md-6">
                             <label>Overview Type</label>

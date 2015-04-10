@@ -7,7 +7,7 @@
  *
  * @author Венцислав Кьоровски
  */
-class AcDB {
+class DB {
     public $Host = null;
     public $Username = null;
     public $Password = null;

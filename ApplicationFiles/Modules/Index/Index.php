@@ -1,6 +1,6 @@
 <?php
 
-class Index extends AcController {
+class Index extends Controller {
     public function Index() {
         parent::__construct();
     }

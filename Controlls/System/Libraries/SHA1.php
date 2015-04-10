@@ -42,7 +42,7 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/general/encryption.html
  */
-class AcSHA1 {
+class SHA1 {
 
 	public function __construct() {
 		log_message('debug', "SHA1 Class Initialized");

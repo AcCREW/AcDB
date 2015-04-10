@@ -45,9 +45,12 @@ angular.module('AngularAcpObject', ['ui.bootstrap'])
 	    $scope.$watch('_this.HasBusinessLogic', function (newValue, oldValue) {
 	        var bHasBusinessLogic = newValue.value == 1;
 	        $scope._this.OverviewTypeOptions[0].disable = !bHasBusinessLogic;
+	        $scope._this.DefaultObjectMethodOptions[1].disable = !bHasBusinessLogic;
+	        $scope._this.DefaultObjectMethodOptions[2].disable = !bHasBusinessLogic;
 	        if (!bHasBusinessLogic) {
 	            $scope._this.OverviewType = $scope._this.OverviewTypeOptions[1];
-	        }
+	            $scope._this.DefaultObjectMethod = $scope._this.DefaultObjectMethodOptions[0];
+            }
 	    });
 
 	    $scope.onTypeChange = function (Field) {

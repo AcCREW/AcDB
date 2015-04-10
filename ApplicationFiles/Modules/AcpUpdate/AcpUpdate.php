@@ -1,6 +1,6 @@
 <?php
 
-class AcpUpdate extends AcController {
+class AcpUpdate extends Controller {
     public function AcpUpdate() {
         parent::__construct();
     }
