@@ -17,11 +17,12 @@ class DB {
     
     public static $_instance = null;
     
-    public function DB($sHost, $sUsername, $sPassword, $sDB, $sPort = null) {
-        $this->Host = $sHost;
-        $this->Username = $sUsername;
-        $this->Password = $sPassword;
-        $this->DB = $sDB;
+    public function DB() {
+        $this->Host = Application::GetConfig('mysql_host');
+        $this->Username = Application::GetConfig('mysql_user');
+        $this->Password = Application::GetConfig('mysql_password');
+        $this->DB = Application::GetConfig('mysql_db');
+        $sPort = Application::GetConfig('mysql_port');
         
         if($sPort == null)
             $this->Port = ini_get('mysqli.default_port');
@@ -38,7 +39,7 @@ class DB {
     
     public function Connect() {
         $this->_mysqli = new mysqli($this->Host, $this->Username, $this->Password, $this->DB, $this->Port)
-            or die('There was a problem connecting to the database');
+            or show_error('There was a problem connecting to the database');
 
         $this->_mysqli->set_charset('utf8');
     }

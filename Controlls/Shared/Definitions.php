@@ -45,7 +45,6 @@ if (is_dir($sSystemPath)){
 define('EXT', '.php');
 define('JS', 'js');
 define('CSS', 'css');
-define('AC', ''); //Default Librarie preffix
 define('APP_START', 'APP_START');
 define('MODULES', 'Modules');
 define('VIEWS', 'Views');

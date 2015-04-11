@@ -11,4 +11,6 @@ $Application->Start();
 //echo '<br />';
 //echo $Application->Check->CompareMemories();
 
+//Dump('asd', false);
+//echo 'asd';
 ?>

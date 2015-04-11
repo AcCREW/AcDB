@@ -38,8 +38,8 @@ class Parser {
 	 *
 	 * @access	public
 	 * @param	string
+	 * @param	string
 	 * @param	array
-	 * @param	bool
 	 * @return	string
 	 */
 	public function Parse($sTemplateName, $sModuleName, $arData = array()) {
@@ -77,7 +77,6 @@ class Parser {
 	 * @access	public
 	 * @param	string
 	 * @param	array
-	 * @param	bool
 	 * @return	string
 	 */
 	function _parse($template, $data) {

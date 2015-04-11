@@ -1,13 +1,16 @@
 <?php
 
-class AcObject extends stdClass {
+class AcObject {
     protected $nRecordID = null;
     protected $sObjectName = null;
     
     private $arData = array();
     private $arPendingData = array();
 
-    protected function __construct($nRecordID = null) {
+    public function __construct($nRecordID = null) {
+        foreach(array_keys(Application::$Class) as $sClassName) {
+            $this->$sClassName = Application::$_this->$sClassName;     
+        }
         if(!empty($nRecordID)) {
             $this->nRecordID = $nRecordID;
             $this->Load();
@@ -32,7 +35,7 @@ class AcObject extends stdClass {
     }
     
     public function GetPropertyValue($sName) {
-        return isset($this->_arPendingData[$sName]) ? $this->_arPendingData[$sName] : (isset($this->_arData[$sName]) ? $this->_arData[$sName] : NULL);
+        return isset($this->arPendingData[$sName]) ? $this->arPendingData[$sName] : (isset($this->arData[$sName]) ? $this->arData[$sName] : NULL);
     }
 
     public function __set($sName, $vValue) {
@@ -45,7 +48,7 @@ class AcObject extends stdClass {
     
     public function SetData($arData = array()) {
         foreach($arData as $sName => $vValue) {
-            $this->__set($sName, $vValue);
+            $this->SetPropertyValue($sName, $vValue);
         }
     }
     

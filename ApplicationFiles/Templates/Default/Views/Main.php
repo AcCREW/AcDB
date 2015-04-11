@@ -31,7 +31,7 @@
 </head>
 <body data-ng-controller="AcController">
     <div class="main-wrap">
-        <nav class="navbar navbar-static-top dash-navbar-top dnl-hidden">
+        <nav class="navbar navbar-static-top dash-navbar-top dnl-hidden" id="TopNav">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#dnt-collapse">

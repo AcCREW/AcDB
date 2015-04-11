@@ -8,10 +8,9 @@ require_once("./Controlls/Shared/Common.php");
  * @property array $Class Stores all loaded classes
  * @property array $JSON Stores all loaded JSONs
  * @property array $Config Stores all configs
- * @property Controller $Controller Controller Class
+ * @property string $DumpContent Stores all dumps and print them in content
  * @property DB $DB DB Class
  * @property Encrypt $Encrypt Encrypt Class
- * @property Generator $Generator Generator Class
  * @property Check $Check Check Class
  * @property Input $Input Input Class
  * @property Parser $Parser Parser Class
@@ -24,12 +23,14 @@ require_once("./Controlls/Shared/Common.php");
 class Application {
     const _ACTION_INITIALIZE_ACDB = 0;
     const _ACTION_LOAD_MODULE = 1000;
+    const _ACTION_GENERATE = 1001;
     
     static $Config = array();
     static $Class = array();
     static $JSON = array();
     static $_this = null;
     static $Title = null;
+    static $DumpContent = '';
     
     protected $Action = self::_ACTION_INITIALIZE_ACDB;
     
@@ -45,61 +46,64 @@ class Application {
 
     public function &__get($sName) {
         if(!isset(self::$Class[$sName])) {
-            self::LoadLibrary($sName);
+            if(($Error = self::LoadLibrary($sName)) instanceof Error) {
+                show_error($Error->Message);
+            }
         }
         
         return self::$Class[$sName];
     }
 
     public function Start() {
-        #region - Fetching Module & Function
-        $sModulePath = $this->Input->get('Module');
-        $sModulePath = $sModulePath !== false ? $sModulePath : DEFAULT_CONTROLLER;
-        //$arModule = explode('/', $sModulePath);
-        //$sModule = ucfirst(end($arModule));
-        $sFunction = $this->Input->get('Function');
-        $sFunction = $sFunction !== false ? $sFunction : DEFAULT_FUNCTION;
-        #endregion
         
-        #region - Load Template - 
-        $sTemplateDir = null;
-        if($this->Action == self::_ACTION_INITIALIZE_ACDB) {
-            $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
-            $sTemplateDir =  '../Templates/'.$sTemplate;
-            self::LoadJSON($sTemplate, TEMPLATES);
+        switch ($this->Action) {
+            case self::_ACTION_GENERATE:
+                $ApplicationGenerator = new ApplicationGenerator();
+                $ApplicationGenerator->Generate();
+                break;
+            case self::_ACTION_INITIALIZE_ACDB:
+                #region - Load Template - 
+                $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
+                $sTemplateDir =  '../Templates/'.$sTemplate;
+                self::LoadJSON($sTemplate, TEMPLATES);
+                
+                $arData = array();
+                $arData['ModuleTitle'] = Application::$Title;
+                $arData['SiteTitle'] = Application::GetConfig('site_title');
+                $arData['RightContent'] = '';
+                $arData['PreloadedJS'] = json_encode($this->PreloadedJSs);
+                $arData['PreloadedJSScheme'] = json_encode($this->PreloadedJSSchemes);
+                $arData['PreloadedCSS'] = $this->PreloadedCSSs;
+                echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
+                #endregion
+                break;
+            case self::_ACTION_LOAD_MODULE:
+                #region - Load Module - 
+                $sModule = $this->Input->get('Module');
+                $sModule = $sModule !== false && !empty($sModule) ? $sModule : DEFAULT_CONTROLLER;
+                $sFunction = $this->Input->get('Function');
+                $sFunction = $sFunction !== false && !empty($sFunction) ? $sFunction : DEFAULT_FUNCTION;
+                
+                if(($Error = self::LoadModule($sModule)) instanceof Error) {
+                    show_error($Error->Message);
+                }
+                $Module = new $sModule();
+                if(!method_exists($Module, $sFunction)) {
+                    show_error("Function '".$sFunction."' doesn't exists in class '".$sModule."'.");
+                }
+                self::LoadJSON($sModule, MODULES, $Module);
+                $sContent = call_user_func_array(array(&$Module, $sFunction), array());
+                
+                $arData = array();
+                $arData['ModuleTitle'] = Application::$Title;
+                $arData['SiteTitle'] = Application::GetConfig('site_title');
+                $arData['Content'] = self::$DumpContent.$sContent;
+                header('Content-Type: application/json');
+                exit (json_encode($arData));
+                #endregion
         }
-        #endregion
-        
-        #region - Load Module -
-        $sContent = '';
-        if($this->Action == self::_ACTION_LOAD_MODULE) {
-            $Module = self::LoadModule($sModulePath);
-            if(!method_exists($Module, $sFunction)) {
-                show_error("Function '".$sFunction."' doesn't exists in class '".$sModulePath."'.");
-            }
-            self::LoadJSON($sModulePath, MODULES, $Module);
-            $sContent = call_user_func_array(array(&$Module, $sFunction), array());
-        }
-        #endregion
-        
-        #region - Parsing Data to Template -
-        $arData = array();
-        $arData['ModuleTitle'] = Application::$Title;
-        $arData['SiteTitle'] = Application::GetConfig('site_title');
-        if($this->Action == self::_ACTION_LOAD_MODULE) {
-            $arData['Content'] = $sContent;
-            header('Content-Type: application/json');
-            echo json_encode($arData);
-        } else {
-            $arData['RightContent'] = $sContent;
-            $arData['PreloadedJS'] = json_encode($this->PreloadedJSs);
-            $arData['PreloadedJSScheme'] = json_encode($this->PreloadedJSSchemes);
-            $arData['PreloadedCSS'] = $this->PreloadedCSSs;
-            echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
-        }
-        #endregion
     }
-
+    
     private function Initialize() {
         $this->PreloadedJSs = new stdClass();
         $this->PreloadedJSSchemes = new stdClass();
@@ -132,8 +136,8 @@ class Application {
         return self::Load($sName, LIBRARIES, $bInitializeClass);
     }
     
-    public static function LoadModule($sName) {
-        return self::Load($sName, MODULES);
+    public static function LoadModule($sName, $bInitializeClass = true) {
+        return self::Load($sName, MODULES, $bInitializeClass);
     }
 
     public static function LoadHelper($sName) {
@@ -203,7 +207,7 @@ class Application {
     
     public static function LoadFile($sFile, $bRequre = false) {
         if(!file_exists($sFile)) {
-            show_error("Unable to load file '".$sFile."'.");
+            return new Error("Unable to load file '".$sFile."'.");
         }
         
         if($bRequre) {
@@ -226,14 +230,15 @@ class Application {
             $sFile = SYSDIR.$sType.'/'.$sNamePath.EXT;
         }
         
-        self::LoadFile($sFile, true);
-        $sClassName = $sType == LIBRARIES ? AC.$sName : $sName;
-        if(in_array($sType, array(LIBRARIES, MODULES))) {
-            if(!class_exists($sClassName)) {
-                show_error("Unable to load class '".$sName."' from file '".$sFile."'.");
+        if(($Error = self::LoadFile($sFile, true)) instanceof Error) {
+            return $Error;
+        }
+        if($sType == LIBRARIES) {
+            if(!class_exists($sName)) {
+                return new Error("Unable to load class '".$sName."' from file '".$sFile."'.");
             }
             if($bInitializeClass) {
-                $Class = new $sClassName();
+                $Class = new $sName();
                 self::$Class[$sName] = $Class;
                 return $Class;
             } else {
@@ -292,8 +297,11 @@ class Application {
 
 require_once(APPPATH."Config/Config.php");
 
-
 function AcAutoLoader($sClass) {
-    Application::LoadLibrary($sClass);
+    Dump($sClass);
+    if(($Error = Application::LoadLibrary($sClass, $sClass == 'DB')) instanceof Error) {
+        if(($Error = Application::LoadModule($sClass, false)) instanceof Error) {
+        }
+    }
 }
 spl_autoload_register('AcAutoLoader');

@@ -198,7 +198,6 @@ class Session {
 
 		// Session is valid!
 		$this->userdata = $session;
-        #Dump($session, false);
 		unset($session);
 
 		return true;
