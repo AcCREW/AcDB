@@ -2,6 +2,8 @@
 
 require_once("./Controlls/Shared/Definitions.php");
 require_once("./Controlls/Shared/Common.php");
+require_once("./Controlls/System/Libraries/Loader.php");
+
 /**
  * @property Application $_this instance
  * @property string $Title Module title
@@ -23,14 +25,14 @@ require_once("./Controlls/Shared/Common.php");
 class Application {
     const _ACTION_INITIALIZE_ACDB = 0;
     const _ACTION_LOAD_MODULE = 1000;
-    const _ACTION_GENERATE = 1001;
+    const _ACTION_SAVE = 1001;
     
-    static $Config = array();
-    static $Class = array();
-    static $JSON = array();
     static $_this = null;
     static $Title = null;
+    
     static $DumpContent = '';
+    
+    static $Config = array();
     
     protected $Action = self::_ACTION_INITIALIZE_ACDB;
     
@@ -45,19 +47,18 @@ class Application {
     }
 
     public function &__get($sName) {
-        if(!isset(self::$Class[$sName])) {
-            if(($Error = self::LoadLibrary($sName)) instanceof Error) {
+        if(!isset(Loader::$Class[$sName])) {
+            if(($Error = Loader::LoadLibrary($sName)) instanceof Error) {
                 show_error($Error->Message);
             }
         }
         
-        return self::$Class[$sName];
+        return Loader::$Class[$sName];
     }
 
     public function Start() {
-        
         switch ($this->Action) {
-            case self::_ACTION_GENERATE:
+            case self::_ACTION_SAVE:
                 $ApplicationGenerator = new ApplicationGenerator();
                 $ApplicationGenerator->Generate();
                 break;
@@ -65,7 +66,7 @@ class Application {
                 #region - Load Template - 
                 $sTemplate =  self::GetConfig('template') !== false ? self::GetConfig('template') : DEFAULT_TEMPLATE;
                 $sTemplateDir =  '../Templates/'.$sTemplate;
-                self::LoadJSON($sTemplate, TEMPLATES);
+                Loader::LoadJSON($sTemplate, TEMPLATES);
                 
                 $arData = array();
                 $arData['ModuleTitle'] = Application::$Title;
@@ -84,17 +85,19 @@ class Application {
                 $sFunction = $this->Input->get('Function');
                 $sFunction = $sFunction !== false && !empty($sFunction) ? $sFunction : DEFAULT_FUNCTION;
                 
-                if(($Error = self::LoadModule($sModule)) instanceof Error) {
+                if(($Error = Loader::LoadModule($sModule)) instanceof Error) {
                     show_error($Error->Message);
                 }
                 $Module = new $sModule();
                 if(!method_exists($Module, $sFunction)) {
                     show_error("Function '".$sFunction."' doesn't exists in class '".$sModule."'.");
                 }
-                self::LoadJSON($sModule, MODULES, $Module);
+                Loader::LoadJSON($sModule, MODULES, $Module);
                 $sContent = call_user_func_array(array(&$Module, $sFunction), array());
                 
                 $arData = array();
+                //Dump($this->Check->CompareTimes(APP_START));
+                //Dump($this->Check->CompareMemories());
                 $arData['ModuleTitle'] = Application::$Title;
                 $arData['SiteTitle'] = Application::GetConfig('site_title');
                 $arData['Content'] = self::$DumpContent.$sContent;
@@ -109,16 +112,16 @@ class Application {
         $this->PreloadedJSSchemes = new stdClass();
         $arAutoloadLibraries = array_unique(self::GetConfig('autoload_libraries'));
 
-        $arNotNeeded = array('Check', 'Utf8', 'Controller');
+        $arNotNeeded = array('Check', 'Utf8', 'AcObject');
         foreach($arNotNeeded as $sNotNeeded) {
             $vCheckIfExists = array_search($sNotNeeded, $arAutoloadLibraries);
             if($vCheckIfExists !== false) {
                 unset($arAutoloadLibraries[$vCheckIfExists]);
             }
-            self::LoadLibrary($sNotNeeded, $sNotNeeded != 'Controller');
+            Loader::LoadLibrary($sNotNeeded, $sNotNeeded != 'AcObject');
         }
         foreach($arAutoloadLibraries as $sLybraryName) {
-            self::LoadLibrary($sLybraryName);
+            Loader::LoadLibrary($sLybraryName);
         }
         foreach(self::GetConfig('autoload_helpers') as $sHelperName) {
             self::LoadHelper($sHelperName);
@@ -130,123 +133,6 @@ class Application {
         if($nAction !== false) {
             $this->Action = $nAction;    
         }
-    }
-
-    public static function LoadLibrary($sName, $bInitializeClass = true) {
-        return self::Load($sName, LIBRARIES, $bInitializeClass);
-    }
-    
-    public static function LoadModule($sName, $bInitializeClass = true) {
-        return self::Load($sName, MODULES, $bInitializeClass);
-    }
-
-    public static function LoadHelper($sName) {
-        return self::Load($sName, HELPERS);
-    }
-    
-    public static function LoadJSON($sNamePath, $sType = MODULES, &$Module = null) {
-        $arName = explode('/', $sNamePath);
-        $sName = ucfirst(end($arName));
-        if(isset(self::$JSON[$sName])) {
-            return self::$JSON[$sName];
-        }
-        $sPath = null;
-        $sString = null;
-        $sDir = null;
-        if($sType == MODULES) {
-            $sDir = APPPATH.MODULES.'/'.$sNamePath.'/';
-            $sPath = $sDir.MODULE_JSON;
-            $sString = 'module';
-        } elseif($sType == TEMPLATES) {
-            $sDir = APPPATH.TEMPLATES.'/'.$sNamePath.'/';
-            $sPath = $sDir.TEMPLATE_JSON;
-            $sString = 'template';
-        } else {
-            show_error("Invalid request for JSON.");
-        }
-        $Object = json_decode(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', self::LoadFile($sPath)));
-        if(!$Object->Enabled) {
-            show_error("The ".$sString." '".$sName."' is not enabled.");
-        }
-        if(property_exists($Object, 'AngularJSIncluded') && $Object->AngularJSIncluded) {
-            self::$_this->LoadJS('Angular'.$sName, ACPATH.$sDir.JS.'/'.'Angular'.$sName);
-            self::$_this->LoadJSScheme('Angular'.$sName, array());
-        }
-        if(property_exists($Object, 'CSS')) {
-            foreach($Object->CSS as $sLink) {
-                self::$_this->LoadCSS(ACPATH.$sDir.$sLink);
-            }
-        }
-        if(property_exists($Object, 'JS')) {
-            foreach($Object->JS as $sKey => $sLink) {
-                self::$_this->LoadJS($sKey, ACPATH.$sDir.$sLink);
-            }
-        }
-        if(property_exists($Object, 'JSSchemes')) {
-            foreach($Object->JSSchemes as $sKey => $sLink) {
-                self::$_this->LoadJSScheme($sKey, $sLink);
-            }
-        }
-        $Object->Dir = $sDir;
-        if(!is_null($Module)) {
-            foreach (get_object_vars($Object) as $sKey => $vValue) {
-                $Module->$sKey = $vValue;
-            }
-            if(property_exists($Object, 'Module')) {
-                Application::$Title = $Object->Module;
-            }
-        }
-        return $Object; 
-    }
-    
-    public static function LoadTemplate($sName, $sModule) {
-        $sFile = APPPATH.MODULES.'/'.$sModule.'/'.VIEWS.'/'.$sName.EXT;
-        
-        return self::LoadFile($sFile);
-    }
-    
-    public static function LoadFile($sFile, $bRequre = false) {
-        if(!file_exists($sFile)) {
-            return new Error("Unable to load file '".$sFile."'.");
-        }
-        
-        if($bRequre) {
-            require_once($sFile);
-            return true;
-        } else {
-            return file_get_contents($sFile);
-        }
-    }
-    
-    public static function Load($sNamePath, $sType = LIBRARIES, $bInitializeClass = true) {
-        $arName = explode('/', $sNamePath);
-        $sName = end($arName);
-        if($sType == LIBRARIES && isset(self::$Class[$sName])) {
-            return self::$Class[$sName];
-        }
-        if($sType == MODULES) {
-            $sFile = APPPATH.$sType.'/'.$sNamePath.'/'.$sName.EXT;
-        } else {
-            $sFile = SYSDIR.$sType.'/'.$sNamePath.EXT;
-        }
-        
-        if(($Error = self::LoadFile($sFile, true)) instanceof Error) {
-            return $Error;
-        }
-        if($sType == LIBRARIES) {
-            if(!class_exists($sName)) {
-                return new Error("Unable to load class '".$sName."' from file '".$sFile."'.");
-            }
-            if($bInitializeClass) {
-                $Class = new $sName();
-                self::$Class[$sName] = $Class;
-                return $Class;
-            } else {
-                return true;
-            }
-        }
-        
-        return true;
     }
 
     public static function SetConfig($sKey, $vValue) {
@@ -298,7 +184,6 @@ class Application {
 require_once(APPPATH."Config/Config.php");
 
 function AcAutoLoader($sClass) {
-    Dump($sClass);
     if(($Error = Application::LoadLibrary($sClass, $sClass == 'DB')) instanceof Error) {
         if(($Error = Application::LoadModule($sClass, false)) instanceof Error) {
         }

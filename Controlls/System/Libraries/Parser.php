@@ -43,7 +43,7 @@ class Parser {
 	 * @return	string
 	 */
 	public function Parse($sTemplateName, $sModuleName, $arData = array()) {
-		$sTemplate = Application::LoadTemplate($sTemplateName, $sModuleName);
+		$sTemplate = Loader::LoadTemplate($sTemplateName, $sModuleName);
 
 		return $this->_parse($sTemplate, $arData);
 	}

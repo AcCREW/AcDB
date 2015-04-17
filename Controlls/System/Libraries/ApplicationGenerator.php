@@ -25,3 +25,29 @@ class ApplicationGenerator extends AcObject {
         Dump('asd');
     }
 }
+
+/**
+ * @property string $ObjectName Object name
+ * @property string $ObjectText Object text name
+ * @property string $ObjectTableName Table where data will be stored
+ * @property array $Fields All object fields
+ */
+class ApplicationObject extends AcObject {
+
+    public function ApplicationObject($nRecordID = null) {
+        parent::__construct($nRecordID);
+    }
+}
+
+/**
+ * @property string $Name Field name
+ * @property string $Type Field type
+ * @property string $Object foreignKey ObjectName
+ * @property double $Decimals Decimals
+ */
+class ApplicationObjectField extends AcObject {
+
+    public function ApplicationObjectField($nRecordID = null) {
+        parent::__construct($nRecordID);
+    }
+}

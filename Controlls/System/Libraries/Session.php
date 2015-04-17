@@ -40,11 +40,11 @@ class Session {
 		}
 
 		// Load the string helper so we can use the strip_slashes() function
-		Application::LoadHelper('String');
+		Loader::LoadHelper('String');
 
 		// Do we need encryption? If so, load the encryption class
 		if ($this->sess_encrypt_cookie == true) {
-			Application::LoadLibrary('Encrypt');
+			Loader::LoadLibrary('Encrypt');
 		}
 
 		// Set the "now" time.  Can either be GMT or server time, based on the
@@ -304,7 +304,6 @@ class Session {
 
 		// Save the old session id so we know which record to
 		// update in the database if we need it
-		$old_sessid = $this->userdata['session_id'];
 		$new_sessid = '';
 		while (strlen($new_sessid) < 32) {
 			$new_sessid .= mt_rand(0, mt_getrandmax());
@@ -362,7 +361,7 @@ class Session {
 					($this->now - 31500000),
 					$this->cookie_path,
 					$this->cookie_domain,
-					0
+					false
 				);
 
 		// Kill session data

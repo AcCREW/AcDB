@@ -1,6 +1,6 @@
 <?php
 
-class AcObject {
+class AcObject extends stdClass {
     protected $nRecordID = null;
     protected $sObjectName = null;
     
@@ -8,7 +8,7 @@ class AcObject {
     private $arPendingData = array();
 
     public function __construct($nRecordID = null) {
-        foreach(array_keys(Application::$Class) as $sClassName) {
+        foreach(array_keys(Loader::$Class) as $sClassName) {
             $this->$sClassName = Application::$_this->$sClassName;     
         }
         if(!empty($nRecordID)) {
