@@ -1,11 +1,11 @@
 <?php
-class Encrypt {
+class CEncrypt {
     
-	var $encryption_key	= '';
-	var $_hash_type	= 'sha1';
-	var $_mcrypt_exists = false;
-	var $_mcrypt_cipher;
-	var $_mcrypt_mode;
+	public static $ECRYPTION_KEY	= '';
+	public static $HASH_TYPE 	= 'sha1';
+	private static $_MCryptExists  = false;
+	private static $_MCryptCipher;
+	private static $_MCryptMode;
 
 	/**
 	 * Constructor
@@ -13,8 +13,14 @@ class Encrypt {
 	 * Simply determines whether the mcrypt library exists.
 	 *
 	 */
-	public function __construct() {
-		$this->_mcrypt_exists = ( ! function_exists('mcrypt_encrypt')) ? false : true;
+	public static function Initialize() {
+		self::$_MCryptExists = (!function_exists('mcrypt_encrypt')) ? false : true;
+        if(($sHashType = Application::GetConfig('HASH_TYPE')) !== false) {
+            self::$HASH_TYPE = $sHashType;
+        }
+        if(($sEncryptionKey = Application::GetConfig('ECRYPTION_KEY')) !== false) {
+            self::$ECRYPTION_KEY = $sEncryptionKey;
+        }
 		log_message('debug', "Encrypt Class Initialized");
 	}
 
@@ -30,13 +36,13 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function get_key($sKey = '') {
+	public static function GetKey($sKey = '') {
 		if ($sKey == '') {
-			if ($this->encryption_key != '') {
-				return $this->encryption_key;
+			if (self::$ECRYPTION_KEY != '') {
+				return self::$ECRYPTION_KEY;
 			}
 
-			$sKey = Application::GetConfig('encryption_key');
+			$sKey = Application::GetConfig('ENCRYPTION_KEY');
 
 			if ($sKey == false) {
 				show_error('In order to use the encryption class requires that you set an encryption key in your config file.');
@@ -55,8 +61,8 @@ class Encrypt {
 	 * @param	string
 	 * @return	void
 	 */
-	function set_key($key = '') {
-		$this->encryption_key = $key;
+	public static function SetKey($sKey = '') {
+		self::$ECRYPTION_KEY = $sKey;
 	}
 
 	// --------------------------------------------------------------------
@@ -77,16 +83,16 @@ class Encrypt {
 	 * @param	string	the key
 	 * @return	string
 	 */
-	function encode($string, $key = '') {
-		$key = $this->get_key($key);
+	public static function Encode($sString, $sKey = '') {
+		$sKey = self::GetKey($sKey);
 
-		if ($this->_mcrypt_exists === true) {
-			$enc = $this->mcrypt_encode($string, $key);
+		if (self::$_MCryptExists === true) {
+			$sEnc = self::MCryptEncode($sString, $sKey);
 		} else {
-			$enc = $this->_xor_encode($string, $key);
+			$sEnc = self::_XOREncode($sString, $sKey);
 		}
 
-		return base64_encode($enc);
+		return base64_encode($sEnc);
 	}
 
 	// --------------------------------------------------------------------
@@ -101,24 +107,24 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function decode($string, $key = '') {
-		$key = $this->get_key($key);
+	public static function Decode($sString, $sKey = '') {
+		$sKey = self::GetKey($sKey);
 
-		if (preg_match('/[^a-zA-Z0-9\/\+=]/', $string)) {
+		if (preg_match('/[^a-zA-Z0-9\/\+=]/', $sString)) {
 			return false;
 		}
 
-		$dec = base64_decode($string);
+		$sDec = base64_decode($sString);
 
-		if ($this->_mcrypt_exists === true) {
-			if (($dec = $this->mcrypt_decode($dec, $key)) === false) {
+		if (self::$_MCryptExists === true) {
+			if (($sDec = self::MCryptDecode($sDec, $sKey)) === false) {
 				return false;
 			}
 		} else {
-			$dec = $this->_xor_decode($dec, $key);
+			$sDec = self::_XORDecode($sDec, $sKey);
 		}
 
-		return $dec;
+		return $sDec;
 	}
 
 	// --------------------------------------------------------------------
@@ -139,8 +145,8 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function encode_from_legacy($string, $legacy_mode = MCRYPT_MODE_ECB, $key = '') {
-		if ($this->_mcrypt_exists === false) {
+	public static function EncodeFromLegacy($sString, $sLegacyMode = MCRYPT_MODE_ECB, $sKey = '') {
+		if (self::$_MCryptExists === false) {
 			log_message('error', 'Encoding from legacy is available only when Mcrypt is in use.');
 			return false;
 		}
@@ -148,28 +154,28 @@ class Encrypt {
 		// decode it first
 		// set mode temporarily to what it was when string was encoded with the legacy
 		// algorithm - typically MCRYPT_MODE_ECB
-		$current_mode = $this->_get_mode();
-		$this->set_mode($legacy_mode);
+		$sCurrentMode = self::_GetMode();
+		self::SetMode($sLegacyMode);
 
-		$key = $this->get_key($key);
+		$sKey = self::GetKey($sKey);
 
-		if (preg_match('/[^a-zA-Z0-9\/\+=]/', $string)) {
+		if (preg_match('/[^a-zA-Z0-9\/\+=]/', $sString)) {
 			return false;
 		}
 
-		$dec = base64_decode($string);
+		$sDec = base64_decode($sString);
 
-		if (($dec = $this->mcrypt_decode($dec, $key)) === false) {
+		if (($sDec = self::MCryptDecode($sDec, $sKey)) === false) {
 			return false;
 		}
 
-		$dec = $this->_xor_decode($dec, $key);
+		$sDec = self::_XORDecode($sDec, $sKey);
 
 		// set the mcrypt mode back to what it should be, typically MCRYPT_MODE_CBC
-		$this->set_mode($current_mode);
+		self::SetMode($sCurrentMode);
 
 		// and re-encode
-		return base64_encode($this->mcrypt_encode($dec, $key));
+		return base64_encode(self::MCryptEncode($sDec, $sKey));
 	}
 
 	// --------------------------------------------------------------------
@@ -185,20 +191,20 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function _xor_encode($string, $key) {
-		$rand = '';
-		while (strlen($rand) < 32) {
-			$rand .= mt_rand(0, mt_getrandmax());
+	public static function _XOREncode($sString, $sKey) {
+		$sRand = '';
+		while (strlen($sRand) < 32) {
+			$sRand .= mt_rand(0, mt_getrandmax());
 		}
 
-		$rand = $this->hash($rand);
+		$sRand = self::Hash($sRand);
 
-		$enc = '';
-		for ($i = 0; $i < strlen($string); $i++) {
-			$enc .= substr($rand, ($i % strlen($rand)), 1).(substr($rand, ($i % strlen($rand)), 1) ^ substr($string, $i, 1));
+		$sEnc = '';
+		for ($i = 0; $i < strlen($sString); $i++) {
+			$sEnc .= substr($sRand, ($i % strlen($sRand)), 1).(substr($sRand, ($i % strlen($sRand)), 1) ^ substr($sString, $i, 1));
 		}
 
-		return $this->_xor_merge($enc, $key);
+		return self::_XORMerge($sEnc, $sKey);
 	}
 
 	// --------------------------------------------------------------------
@@ -214,15 +220,15 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function _xor_decode($string, $key) {
-		$string = $this->_xor_merge($string, $key);
+	public static function _XORDecode($sString, $sKey) {
+		$sString = self::_XORMerge($sString, $sKey);
 
-		$dec = '';
-		for ($i = 0; $i < strlen($string); $i++) {
-			$dec .= (substr($string, $i++, 1) ^ substr($string, $i, 1));
+		$sDec = '';
+		for ($i = 0; $i < strlen($sString); $i++) {
+			$sDec .= (substr($sString, $i++, 1) ^ substr($sString, $i, 1));
 		}
 
-		return $dec;
+		return $sDec;
 	}
 
 	// --------------------------------------------------------------------
@@ -237,14 +243,14 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function _xor_merge($string, $key) {
-		$hash = $this->hash($key);
-		$str = '';
-		for ($i = 0; $i < strlen($string); $i++) {
-			$str .= substr($string, $i, 1) ^ substr($hash, ($i % strlen($hash)), 1);
+	public static function _XORMerge($sString, $sKey) {
+		$hash = self::Hash($sKey);
+		$sStr = '';
+		for ($i = 0; $i < strlen($sString); $i++) {
+			$sStr .= substr($sString, $i, 1) ^ substr($hash, ($i % strlen($hash)), 1);
 		}
 
-		return $str;
+		return $sStr;
 	}
 
 	// --------------------------------------------------------------------
@@ -257,10 +263,10 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function mcrypt_encode($data, $key) {
-		$init_size = mcrypt_get_iv_size($this->_get_cipher(), $this->_get_mode());
-		$init_vect = mcrypt_create_iv($init_size, MCRYPT_RAND);
-		return $this->_add_cipher_noise($init_vect.mcrypt_encrypt($this->_get_cipher(), $key, $data, $this->_get_mode(), $init_vect), $key);
+	public static function MCryptEncode($vData, $sKey) {
+		$nInitSize = mcrypt_get_iv_size(self::_GetCipher(), self::_GetMode());
+		$nInitVect = mcrypt_create_iv($nInitSize, MCRYPT_RAND);
+		return self::_AddCipherNoise($nInitVect.mcrypt_encrypt(self::_GetCipher(), $sKey, $vData, self::_GetMode(), $nInitVect), $sKey);
 	}
 
 	// --------------------------------------------------------------------
@@ -273,17 +279,17 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function mcrypt_decode($data, $key) {
-		$data = $this->_remove_cipher_noise($data, $key);
-		$init_size = mcrypt_get_iv_size($this->_get_cipher(), $this->_get_mode());
+	public static function MCryptDecode($vData, $sKey) {
+		$vData = self::_RemoveCipherNoise($vData, $sKey);
+		$nInitSize = mcrypt_get_iv_size(self::_GetCipher(), self::_GetMode());
 
-		if ($init_size > strlen($data)) {
+		if ($nInitSize > strlen($vData)) {
 			return false;
 		}
 
-		$init_vect = substr($data, 0, $init_size);
-		$data = substr($data, $init_size);
-		return rtrim(mcrypt_decrypt($this->_get_cipher(), $key, $data, $this->_get_mode(), $init_vect), "\0");
+		$nInitVect = substr($vData, 0, $nInitSize);
+		$vData = substr($vData, $nInitSize);
+		return rtrim(mcrypt_decrypt(self::_GetCipher(), $sKey, $vData, self::_GetMode(), $nInitVect), "\0");
 	}
 
 	// --------------------------------------------------------------------
@@ -300,20 +306,20 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function _add_cipher_noise($data, $key) {
-		$keyhash = $this->hash($key);
-		$keylen = strlen($keyhash);
-		$str = '';
+	public static function _AddCipherNoise($vData, $sKey) {
+		$sKeyHash = self::Hash($sKey);
+		$sKeylen = strlen($sKeyHash);
+		$sStr = '';
 
-		for ($i = 0, $j = 0, $len = strlen($data); $i < $len; ++$i, ++$j) {
-			if ($j >= $keylen) {
+		for ($i = 0, $j = 0, $nLen = strlen($vData); $i < $nLen; ++$i, ++$j) {
+			if ($j >= $sKeylen) {
 				$j = 0;
 			}
 
-			$str .= chr((ord($data[$i]) + ord($keyhash[$j])) % 256);
+			$sStr .= chr((ord($vData[$i]) + ord($sKeyHash[$j])) % 256);
 		}
 
-		return $str;
+		return $sStr;
 	}
 
 	// --------------------------------------------------------------------
@@ -325,29 +331,29 @@ class Encrypt {
 	 * Function description
 	 *
 	 * @access	public
-	 * @param	type
-	 * @return	type
+	 * @param	string
+	 * @return	string
 	 */
-	function _remove_cipher_noise($data, $key) {
-		$keyhash = $this->hash($key);
-		$keylen = strlen($keyhash);
-		$str = '';
+	public static function _RemoveCipherNoise($vData, $sKey) {
+		$sKeyHash = self::Hash($sKey);
+		$sKeylen = strlen($sKeyHash);
+		$sStr = '';
 
-		for ($i = 0, $j = 0, $len = strlen($data); $i < $len; ++$i, ++$j) {
-			if ($j >= $keylen) {
+		for ($i = 0, $j = 0, $nLen = strlen($vData); $i < $nLen; ++$i, ++$j) {
+			if ($j >= $sKeylen) {
 				$j = 0;
 			}
 
-			$temp = ord($data[$i]) - ord($keyhash[$j]);
+			$sTemp = ord($vData[$i]) - ord($sKeyHash[$j]);
 
-			if ($temp < 0) {
-				$temp = $temp + 256;
+			if ($sTemp < 0) {
+				$sTemp = $sTemp + 256;
 			}
 
-			$str .= chr($temp);
+			$sStr .= chr($sTemp);
 		}
 
-		return $str;
+		return $sStr;
 	}
 
 	// --------------------------------------------------------------------
@@ -356,11 +362,11 @@ class Encrypt {
 	 * Set the Mcrypt Cipher
 	 *
 	 * @access	public
-	 * @param	constant
-	 * @return	string
+	 * @param	string
+	 * @return	void
 	 */
-	function set_cipher($cipher) {
-		$this->_mcrypt_cipher = $cipher;
+	public static function SetCipher($sCipher) {
+		self::$_MCryptCipher = $sCipher;
 	}
 
 	// --------------------------------------------------------------------
@@ -369,11 +375,11 @@ class Encrypt {
 	 * Set the Mcrypt Mode
 	 *
 	 * @access	public
-	 * @param	constant
-	 * @return	string
+	 * @param	string
+	 * @return	void
 	 */
-	function set_mode($mode) {
-		$this->_mcrypt_mode = $mode;
+	public static function SetMode($sMode) {
+		self::$_MCryptMode = $sMode;
 	}
 
 	// --------------------------------------------------------------------
@@ -384,12 +390,12 @@ class Encrypt {
 	 * @access	private
 	 * @return	string
 	 */
-	function _get_cipher() {
-		if ($this->_mcrypt_cipher == '') {
-			$this->_mcrypt_cipher = MCRYPT_RIJNDAEL_256;
+	public static function _GetCipher() {
+		if (self::$_MCryptCipher == '') {
+			self::$_MCryptCipher = MCRYPT_RIJNDAEL_256;
 		}
 
-		return $this->_mcrypt_cipher;
+		return self::$_MCryptCipher;
 	}
 
 	// --------------------------------------------------------------------
@@ -400,12 +406,12 @@ class Encrypt {
 	 * @access	private
 	 * @return	string
 	 */
-	function _get_mode() {
-		if ($this->_mcrypt_mode == '') {
-			$this->_mcrypt_mode = MCRYPT_MODE_CBC;
+	public static function _GetMode() {
+		if (self::$_MCryptMode == '') {
+			self::$_MCryptMode = MCRYPT_MODE_CBC;
 		}
 
-		return $this->_mcrypt_mode;
+		return self::$_MCryptMode;
 	}
 
 	// --------------------------------------------------------------------
@@ -415,10 +421,10 @@ class Encrypt {
 	 *
 	 * @access	public
 	 * @param	string
-	 * @return	string
+	 * @return	void
 	 */
-	function set_hash($type = 'sha1') {
-		$this->_hash_type = ($type != 'sha1' && $type != 'md5') ? 'sha1' : $type;
+	public static function SetHash($sType = 'sha1') {
+		self::$HASH_TYPE = ($sType != 'sha1' && $sType != 'md5') ? 'sha1' : $sType;
 	}
 
 	// --------------------------------------------------------------------
@@ -430,8 +436,8 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function hash($str) {
-		return ($this->_hash_type == 'sha1') ? $this->sha1($str) : md5($str);
+	public static function Hash($sStr) {
+		return (self::$HASH_TYPE == 'sha1') ? self::SHA1($sStr) : md5($sStr);
 	}
 
 	// --------------------------------------------------------------------
@@ -443,16 +449,15 @@ class Encrypt {
 	 * @param	string
 	 * @return	string
 	 */
-	function sha1($str) {
-		if ( ! function_exists('sha1')) {
-			if ( ! function_exists('mhash')) {
-				$SH = Application::LoadLibrary('SHA1');
-				return $SH->generate($str);
+	public static function SHA1($sStr) {
+		if (!function_exists('sha1')) {
+			if (!function_exists('mhash')) {
+				return CSHA1::Generate($sStr);
 			} else {
-				return bin2hex(mhash(MHASH_SHA1, $str));
+				return bin2hex(mhash(MHASH_SHA1, $sStr));
 			}
 		} else {
-			return sha1($str);
+			return sha1($sStr);
 		}
 	}
 

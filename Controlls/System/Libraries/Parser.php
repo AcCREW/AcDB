@@ -1,21 +1,5 @@
 <?php
 /**
- * CodeIgniter
- *
- * An open source application development framework for PHP 5.1.6 or newer
- *
- * @package		CodeIgniter
- * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
- * @license		http://codeigniter.com/user_guide/license.html
- * @link		http://codeigniter.com
- * @since		Version 1.0
- * @filesource
- */
-
-// ------------------------------------------------------------------------
-
-/**
  * Parser Class
  *
  * @package		CodeIgniter
@@ -24,11 +8,10 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/libraries/parser.html
  */
-class Parser {
+class CParser {
 
-	var $l_delim = '{';
-	var $r_delim = '}';
-	var $object;
+	public static $L_DELIM = '{';
+	public static $R_DELIM = '}';
 
 	/**
 	 *  Parse a template
@@ -42,10 +25,10 @@ class Parser {
 	 * @param	array
 	 * @return	string
 	 */
-	public function Parse($sTemplateName, $sModuleName, $arData = array()) {
+	public static function Parse($sTemplateName, $sModuleName, $arData = array()) {
 		$sTemplate = Loader::LoadTemplate($sTemplateName, $sModuleName);
 
-		return $this->_parse($sTemplate, $arData);
+		return self::_Parse($sTemplate, $arData);
 	}
 
 	// --------------------------------------------------------------------
@@ -62,8 +45,8 @@ class Parser {
 	 * @param	bool
 	 * @return	string
 	 */
-	function ParseString($sTemplateName, $arData) {
-		return $this->_parse($sTemplateName, $arData);
+	public static function ParseString($sTemplateName, $arData) {
+		return self::_Parse($sTemplateName, $arData);
 	}
 
 	// --------------------------------------------------------------------
@@ -79,22 +62,22 @@ class Parser {
 	 * @param	array
 	 * @return	string
 	 */
-	function _parse($template, $data) {
-		if ($template == '') {
+	public static function _Parse($sTemplate, $arData) {
+		if ($sTemplate == '') {
 			return false;
 		}
         
-        $data['BaseURL'] = ACPATH;
+        $arData['BaseURL'] = ACPATH;
 
-		foreach ($data as $key => $val) {
-			if (is_array($val)) {
-				$template = $this->_parse_pair($key, $val, $template);
+		foreach ($arData as $sKey => $vVal) {
+			if (is_array($vVal)) {
+				$sTemplate = self::_ParsePair($sKey, $vVal, $sTemplate);
 			} else {
-				$template = $this->_parse_single($key, (string)$val, $template);
+				$sTemplate = self::_ParseSingle($sKey, (string)$vVal, $sTemplate);
 			}
 		}
 
-		return $template;
+		return $sTemplate;
 	}
 
 	// --------------------------------------------------------------------
@@ -107,9 +90,9 @@ class Parser {
 	 * @param	string
 	 * @return	void
 	 */
-	function set_delimiters($l = '{', $r = '}') {
-		$this->l_delim = $l;
-		$this->r_delim = $r;
+	public static function SetDelimiters($sL = '{', $sR = '}') {
+		self::$L_DELIM = $sL;
+		self::$R_DELIM = $sR;
 	}
 
 	// --------------------------------------------------------------------
@@ -123,8 +106,8 @@ class Parser {
 	 * @param	string
 	 * @return	string
 	 */
-	function _parse_single($key, $val, $string) {
-		return str_replace($this->l_delim.$key.$this->r_delim, $val, $string);
+	public static function _ParseSingle($sKey, $vVal, $sString) {
+		return str_replace(self::$L_DELIM.$sKey.self::$R_DELIM, $vVal, $sString);
 	}
 
 	// --------------------------------------------------------------------
@@ -140,26 +123,26 @@ class Parser {
 	 * @param	string
 	 * @return	string
 	 */
-	function _parse_pair($variable, $data, $string) {
-		if (false === ($match = $this->_match_pair($string, $variable))) {
-			return $string;
+	public static function _ParsePair($vVariable, $arData, $sString) {
+		if (false === ($arMatch = self::_MatchPair($sString, $vVariable))) {
+			return $sString;
 		}
 
-		$str = '';
-		foreach ($data as $row) {
-			$temp = $match['1'];
-			foreach ($row as $key => $val) {
-				if (!is_array($val)) {
-					$temp = $this->_parse_single($key, $val, $temp);
+		$sStr = '';
+		foreach ($arData as $sRow) {
+			$sTemp = $arMatch['1'];
+			foreach ($sRow as $sKey => $vVal) {
+				if (!is_array($vVal)) {
+					$sTemp = self::_ParseSingle($sKey, $vVal, $sTemp);
 				} else {
-					$temp = $this->_parse_pair($key, $val, $temp);
+					$sTemp = self::_ParsePair($sKey, $vVal, $sTemp);
 				}
 			}
 
-			$str .= $temp;
+			$sStr .= $sTemp;
 		}
 
-		return str_replace($match['0'], $str, $string);
+		return str_replace($arMatch['0'], $sStr, $sString);
 	}
 
 	// --------------------------------------------------------------------
@@ -172,12 +155,12 @@ class Parser {
 	 * @param	string
 	 * @return	mixed
 	 */
-	function _match_pair($string, $variable) 	{
-		if ( ! preg_match("|" . preg_quote($this->l_delim) . $variable . preg_quote($this->r_delim) . "(.+?)". preg_quote($this->l_delim) . '/' . $variable . preg_quote($this->r_delim) . "|s", $string, $match)) {
+	public static function _MatchPair($sString, $vVariable) 	{
+		if (!preg_match("|" . preg_quote(self::$L_DELIM) . $vVariable . preg_quote(self::$R_DELIM) . "(.+?)". preg_quote(self::$L_DELIM) . '/' . $vVariable . preg_quote(self::$R_DELIM) . "|s", $sString, $arMatch)) {
 			return false;
 		}
 
-		return $match;
+		return $arMatch;
 	}
 
 }

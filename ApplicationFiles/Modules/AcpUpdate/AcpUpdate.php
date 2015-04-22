@@ -6,6 +6,6 @@ class AcpUpdate extends AcObject {
     }
     
     public function Render() {
-        return $this->Parser->Parse('AcpUpdate', 'AcpUpdate', array('Message' => 'Grid!', 'Module' => 'Update'));
+        return CParser::Parse('AcpUpdate', 'AcpUpdate', array('Message' => 'Grid!', 'Module' => 'Update'));
     }
 }

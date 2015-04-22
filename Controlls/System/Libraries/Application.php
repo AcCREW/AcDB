@@ -12,14 +12,13 @@ require_once("./Controlls/System/Libraries/Loader.php");
  * @property array $Config Stores all configs
  * @property string $DumpContent Stores all dumps and print them in content
  * @property DB $DB DB Class
- * @property Encrypt $Encrypt Encrypt Class
+ * @property CEncrypt $Encrypt Encrypt Class
  * @property Check $Check Check Class
- * @property Input $Input Input Class
+ * @property CInput $Input Input Class
  * @property Parser $Parser Parser Class
- * @property Security $Security Security Class
- * @property Session $Session Session Class
+ * @property CSecurity $Security Security Class
+ * @property CSession $Session Session Class
  * @property SHA1 $SHA1 SHA1 Class
- * @property URI $URI URI Class
  * @property Utf8 $Utf8 Utf8 Class
  */
 class Application {
@@ -46,16 +45,6 @@ class Application {
         $this->InitializeAction();
     }
 
-    public function &__get($sName) {
-        if(!isset(Loader::$Class[$sName])) {
-            if(($Error = Loader::LoadLibrary($sName)) instanceof Error) {
-                show_error($Error->Message);
-            }
-        }
-        
-        return Loader::$Class[$sName];
-    }
-
     public function Start() {
         switch ($this->Action) {
             case self::_ACTION_SAVE:
@@ -75,14 +64,14 @@ class Application {
                 $arData['PreloadedJS'] = json_encode($this->PreloadedJSs);
                 $arData['PreloadedJSScheme'] = json_encode($this->PreloadedJSSchemes);
                 $arData['PreloadedCSS'] = $this->PreloadedCSSs;
-                echo $this->Parser->Parse('Main', $sTemplateDir, $arData);
+                echo CParser::Parse('Main', $sTemplateDir, $arData);
                 #endregion
                 break;
             case self::_ACTION_LOAD_MODULE:
                 #region - Load Module - 
-                $sModule = $this->Input->get('Module');
+                $sModule = CInput::Get('Module');
                 $sModule = $sModule !== false && !empty($sModule) ? $sModule : DEFAULT_CONTROLLER;
-                $sFunction = $this->Input->get('Function');
+                $sFunction =  CInput::Get('Function');
                 $sFunction = $sFunction !== false && !empty($sFunction) ? $sFunction : DEFAULT_FUNCTION;
                 
                 if(($Error = Loader::LoadModule($sModule)) instanceof Error) {
@@ -110,26 +99,16 @@ class Application {
     private function Initialize() {
         $this->PreloadedJSs = new stdClass();
         $this->PreloadedJSSchemes = new stdClass();
-        $arAutoloadLibraries = array_unique(self::GetConfig('autoload_libraries'));
-
-        $arNotNeeded = array('Check', 'Utf8', 'AcObject');
-        foreach($arNotNeeded as $sNotNeeded) {
-            $vCheckIfExists = array_search($sNotNeeded, $arAutoloadLibraries);
-            if($vCheckIfExists !== false) {
-                unset($arAutoloadLibraries[$vCheckIfExists]);
-            }
-            Loader::LoadLibrary($sNotNeeded, $sNotNeeded != 'AcObject');
-        }
-        foreach($arAutoloadLibraries as $sLybraryName) {
-            Loader::LoadLibrary($sLybraryName);
-        }
+        foreach(self::GetConfig('autoload_libraries') as $sLibrarieName) {
+            Loader::LoadLibrary($sLibrarieName, true);
+        }        
         foreach(self::GetConfig('autoload_helpers') as $sHelperName) {
-            self::LoadHelper($sHelperName);
+            Loader::LoadHelper($sHelperName);
         }
     }
     
     private function InitializeAction() {
-        $nAction = $this->Input->get('Action');
+        $nAction = CInput::Get('Action');
         if($nAction !== false) {
             $this->Action = $nAction;    
         }
@@ -184,8 +163,9 @@ class Application {
 require_once(APPPATH."Config/Config.php");
 
 function AcAutoLoader($sClass) {
-    if(($Error = Application::LoadLibrary($sClass, $sClass == 'DB')) instanceof Error) {
-        if(($Error = Application::LoadModule($sClass, false)) instanceof Error) {
+    if(($Error = Loader::LoadLibrary($sClass, true)) instanceof Error) {
+        if(($Error = Loader::LoadModule($sClass)) instanceof Error) {
+            show_error($Error->Message);
         }
     }
 }

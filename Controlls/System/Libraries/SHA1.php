@@ -42,9 +42,9 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/general/encryption.html
  */
-class SHA1 {
+class CSHA1 {
 
-	public function __construct() {
+	public static function Initialize() {
 		log_message('debug', "SHA1 Class Initialized");
 	}
 
@@ -55,7 +55,7 @@ class SHA1 {
 	 * @param	string
 	 * @return	string
 	 */
-	function generate($str) {
+	public static function Generate($str) {
 		$n = ((strlen($str) + 8) >> 6) + 1;
 
 		for ($i = 0; $i < $n * 16; $i++)

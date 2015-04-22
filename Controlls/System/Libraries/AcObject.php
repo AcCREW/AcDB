@@ -8,9 +8,6 @@ class AcObject extends stdClass {
     private $arPendingData = array();
 
     public function __construct($nRecordID = null) {
-        foreach(array_keys(Loader::$Class) as $sClassName) {
-            $this->$sClassName = Application::$_this->$sClassName;     
-        }
         if(!empty($nRecordID)) {
             $this->nRecordID = $nRecordID;
             $this->Load();

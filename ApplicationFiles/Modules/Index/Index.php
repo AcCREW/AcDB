@@ -6,6 +6,6 @@ class Index extends AcObject {
     }
     
     public function Render() {
-        return $this->Parser->Parse('Index', 'Index', array('Message' => 'Welcome to AcGenerator!', 'Module' => 'Index'));
+        return CParser::Parse('Index', 'Index', array('Message' => 'Welcome to AcGenerator!', 'Module' => 'Index'));
     }
 }

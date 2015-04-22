@@ -6,6 +6,6 @@ class AcpObject extends AcObject {
     }
     
     public function Render() {
-        return $this->Parser->Parse('AcpObject', 'AcpObject');        
+        return CParser::Parse('AcpObject', 'AcpObject');        
     }
 }

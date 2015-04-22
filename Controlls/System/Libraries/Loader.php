@@ -1,15 +1,14 @@
 <?php
 
 class Loader {
-    static $Class = array();
     static $JSON = array();
     
-    public static function LoadLibrary($sName, $bInitializeClass = true) {
-        return self::Load($sName, LIBRARIES, $bInitializeClass);
+    public static function LoadLibrary($sName, $bInitialize) {
+        return self::Load($sName, LIBRARIES, $bInitialize);
     }
     
-    public static function LoadModule($sName, $bInitializeClass = true) {
-        return self::Load($sName, MODULES, $bInitializeClass);
+    public static function LoadModule($sName) {
+        return self::Load($sName, MODULES);
     }
 
     public static function LoadHelper($sName) {
@@ -90,32 +89,24 @@ class Loader {
         }
     }
     
-    public static function Load($sNamePath, $sType = LIBRARIES, $bInitializeClass = true) {
-        $arName = explode('/', $sNamePath);
-        $sName = end($arName);
-        if($sType == LIBRARIES && isset(self::$Class[$sName])) {
-            return self::$Class[$sName];
+    public static function Load($sName, $sType = LIBRARIES, $bInitialize = false) {
+        $sTMPLoadName = $sName;
+        if(substr($sTMPLoadName, 0, 1) == 'C') {
+            $sTMPLoadName = substr($sTMPLoadName, 1);
         }
+        
         if($sType == MODULES) {
-            $sFile = APPPATH.$sType.'/'.$sNamePath.'/'.$sName.EXT;
+            $sFile = APPPATH.$sType.'/'.$sTMPLoadName.'/'.$sTMPLoadName.EXT;
         } else {
-            $sFile = SYSDIR.$sType.'/'.$sNamePath.EXT;
+            $sFile = SYSDIR.$sType.'/'.$sTMPLoadName.EXT;
         }
         
         if(($Error = self::LoadFile($sFile, true)) instanceof Error) {
             return $Error;
         }
-        if($sType == LIBRARIES) {
-            if(!class_exists($sName)) {
-                return new Error("Unable to load class '".$sName."' from file '".$sFile."'.");
-            }
-            if($bInitializeClass) {
-                $Class = new $sName();
-                self::$Class[$sName] = $Class;
-                return $Class;
-            } else {
-                return true;
-            }
+        
+        if($sType == LIBRARIES && $bInitialize && method_exists($sName, 'Initialize')) {
+            $sName::Initialize();
         }
         
         return true;

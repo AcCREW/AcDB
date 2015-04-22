@@ -1,21 +1,5 @@
 <?php
 /**
- * CodeIgniter
- *
- * An open source application development framework for PHP 5.1.6 or newer
- *
- * @package		CodeIgniter
- * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
- * @license		http://codeigniter.com/user_guide/license.html
- * @link		http://codeigniter.com
- * @since		Version 2.0
- * @filesource
- */
-
-// ------------------------------------------------------------------------
-
-/**
  * Utf8 Class
  *
  * Provides support for UTF-8 environments
@@ -26,15 +10,13 @@
  * @author		ExpressionEngine Dev Team
  * @link		http://codeigniter.com/user_guide/libraries/utf8.html
  */
-class Utf8 {
+class CUtf8 {
 
 	/**
 	 * Constructor
-	 *
 	 * Determines if UTF-8 support is to be enabled
-	 *
 	 */
-	function __construct() {
+	public static function Initialize() {
 		log_message('debug', "Utf8 Class Initialized");
 
 		if (
@@ -73,12 +55,12 @@ class Utf8 {
 	 * @param	string
 	 * @return	string
 	 */
-	function clean_string($str) {
-		if ($this->_is_ascii($str) === false) 	{
-			$str = @iconv('UTF-8', 'UTF-8//IGNORE', $str);
+	public static function CleanString($sStr) {
+		if (self::_IsAscii($sStr) === false) 	{
+			$sStr = @iconv('UTF-8', 'UTF-8//IGNORE', $sStr);
 		}
 
-		return $str;
+		return $sStr;
 	}
 
 	// --------------------------------------------------------------------
@@ -94,8 +76,8 @@ class Utf8 {
 	 * @param	string
 	 * @return	string
 	 */
-	function safe_ascii_for_xml($str) {
-		return remove_invisible_characters($str, false);
+	public static function SafeAsciiForXML($sStr) {
+		return remove_invisible_characters($sStr, false);
 	}
 
 	// --------------------------------------------------------------------
@@ -110,16 +92,16 @@ class Utf8 {
 	 * @param	string	- input encoding
 	 * @return	string
 	 */
-	function convert_to_utf8($str, $encoding) {
+	public static function ConvertToUTF8($sStr, $sEncoding) {
 		if (function_exists('iconv')) {
-			$str = @iconv($encoding, 'UTF-8', $str);
+			$sStr = @iconv($sEncoding, 'UTF-8', $sStr);
 		} elseif (function_exists('mb_convert_encoding')) {
-			$str = @mb_convert_encoding($str, 'UTF-8', $encoding);
+			$sStr = @mb_convert_encoding($sStr, 'UTF-8', $sEncoding);
 		} else {
 			return false;
 		}
 
-		return $str;
+		return $sStr;
 	}
 
 	// --------------------------------------------------------------------
@@ -133,8 +115,8 @@ class Utf8 {
 	 * @param	string
 	 * @return	bool
 	 */
-	function _is_ascii($str) {
-		return (preg_match('/[^\x00-\x7F]/S', $str) == 0);
+	public static function _IsAscii($sStr) {
+		return (preg_match('/[^\x00-\x7F]/S', $sStr) == 0);
 	}
 
 	// --------------------------------------------------------------------
