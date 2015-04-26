@@ -5,40 +5,40 @@
  *
  * @author Венцислав Кьоровски
  */
-class Check {
-    private $MarkedTimes = array();
-    private $MarkedMemories = array();
+class CCheck {
+    private static $MarkedTimes = array();
+    private static $MarkedMemories = array();
     
-    public function Check() {
+    public static function _Initialize() {
         global $nAppStartTime, $nAppStartMemory;
-        $this->MarkTime(APP_START, $nAppStartTime);
-        $this->MarkMemory(APP_START, $nAppStartMemory);
+        self::MarkTime(APP_START, $nAppStartTime);
+        self::MarkMemory(APP_START, $nAppStartMemory);
     }
     
-    public function MarkTime($sMarker, $nTime = null) {
+    public static function MarkTime($sMarker, $nTime = null) {
         if(is_null($nTime)) {
             $nTime = array_sum(explode(' ', microtime()));
         }
-        $this->MarkedTimes[$sMarker] = $nTime;
+        self::$MarkedTimes[$sMarker] = $nTime;
     }
     
-    public function MarkMemory($sMarker, $nSize = null) {
+    public static function MarkMemory($sMarker, $nSize = null) {
         if(is_null($nSize)) {
             $nSize = memory_get_usage(true);
         }
-        $this->MarkedMemories[$sMarker] = $nSize;
+        self::$MarkedMemories[$sMarker] = $nSize;
     }
     
-    public function CompareMemories($sStartMarker = null, $sEndMarker = null) {
-        return $this->Compare($sStartMarker, $sEndMarker, 'Memory');
+    public static function CompareMemories($sStartMarker = null, $sEndMarker = null) {
+        return self::Compare($sStartMarker, $sEndMarker, 'Memory');
     }
     
-    public function CompareTimes($sStartMarker = null, $sEndMarker = null) {
-        return $this->Compare($sStartMarker, $sEndMarker, 'Time');
+    public static function CompareTimes($sStartMarker = null, $sEndMarker = null) {
+        return self::Compare($sStartMarker, $sEndMarker, 'Time');
     }
     
-    private function Compare($sStartMarker = null, $sEndMarker = null, $sType = 'Time') {
-        $arMarketValues = $sType == 'Time' ? $this->MarkedTimes : $this->MarkedMemories;
+    private static function Compare($sStartMarker = null, $sEndMarker = null, $sType = 'Time') {
+        $arMarketValues = $sType == 'Time' ? self::$MarkedTimes : self::$MarkedMemories;
         if(!isset($arMarketValues[$sStartMarker])) {
             if($sType == 'Time') {
                 show_error("Can't find start time.");
@@ -55,19 +55,6 @@ class Check {
             $nEndValue = $arMarketValues[$sEndMarker];
         }
         
-        return $sType == 'Time' ? sprintf('%.4f', $nEndValue - $nStartValue) : $this->Convert($nEndValue - $nStartValue); 
-    }
-    
-    public function Convert($vSize) {
-        $arUnits = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
-        return @round($vSize/pow(1024,($i=floor(log($vSize,1024)))),2).' '.$arUnits[$i];
+        return $sType == 'Time' ? sprintf('%.4f', $nEndValue - $nStartValue) : ConvertBytesToString($nEndValue - $nStartValue); 
     }
 }
-
-//function convert($size)
-//{
-//    $unit=array('b','kb','mb','gb','tb','pb');
-//    return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
-//}
-
-//echo convert(memory_get_usage(true));

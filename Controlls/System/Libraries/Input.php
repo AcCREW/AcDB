@@ -65,12 +65,12 @@ class CInput {
 	 *
 	 * @return	void
 	 */
-	public static function Initialize() {
+	public static function _Initialize() {
 		log_message('debug', "Input Class Initialized");
 
-		self::$_AllowGetArray	= (Application::GetConfig('allow_get_array') === true);
-		self::$_EnableXSS		= (Application::GetConfig('global_xss_filtering') === true);
-		self::$_EnableCSRF		= (Application::GetConfig('csrf_protection') === true);
+		self::$_AllowGetArray	= (Application::GetConfig('ALLOW_GET_ARRAY') === true);
+		self::$_EnableXSS		= (Application::GetConfig('ENABLE_XSS_FILTERING') === true);
+		self::$_EnableCSRF		= (Application::GetConfig('CSRF_PROTECTION') === true);
 
 		// Sanitize global arrays
 		self::_SanitizeGlobals();

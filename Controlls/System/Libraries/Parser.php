@@ -68,6 +68,8 @@ class CParser {
 		}
         
         $arData['BaseURL'] = ACPATH;
+        $arData['CSRF_TOKEN_NAME'] = CSecurity::GetCSRFTokenName();
+        $arData['CSRF_TOKEN_VALUE'] = CSecurity::GetCSRFHash();
 
 		foreach ($arData as $sKey => $vVal) {
 			if (is_array($vVal)) {

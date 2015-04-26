@@ -16,18 +16,8 @@
     var _UserService = {};
 
     return _UserService;
-}).config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
-    $ocLazyLoadProvider.config({
-        loadedModules: [],
-        jsLoader: requirejs,
-        debug: false
-    });
-}]).controller('AcController', ['$scope', '$ocLazyLoad', '$http', 'ngProgress', function ($scope, $ocLazyLoad, $http, ngProgress) {
-    $scope.RightContent = "";
-    $scope.arHTMLCache = Array();
-    $scope.CurrentModule = "AcpObject"; // defualt Index
-
-    $scope.Request = function (sURL, vData) {
+}).service('AcHTTP', function ($http) {
+    this.Request = function (sURL, vData) {
         var request = $http({
             method: 'GET',
             url: sURL,
@@ -38,7 +28,48 @@
         return (request.then(function (response) { return response.data }, function (response) { return new Error(response.statusText, response.status); }));
     }
 
+    this.PostRequest = function (sURL, vData) {
+        eval("var Obj = { " + CSRFTokenName + " : '" + CSRFTokenValue + "' }");
+
+        var request = $http({
+            method: 'POST',
+            url: sURL,
+            data: $.param($.extend({}, Obj, vData)),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        return (request.then(function (response) { return response.data }, function (response) { return new Error(response.statusText, response.status); }));
+    }
+}).directive('focusMe', function($timeout, $parse) {
+    return {
+        //scope: true,   // optionally create a child scope
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.focusMe);
+            scope.$watch(model, function(value) {
+                if(value === true) { 
+                    $timeout(function() {
+                        element[0].focus(); 
+                    });
+                }
+            });
+        }
+    };
+}).config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
+    $ocLazyLoadProvider.config({
+        loadedModules: [],
+        jsLoader: requirejs,
+        debug: false
+    });
+}]).controller('AcController', ['$scope', '$ocLazyLoad', '$http', 'ngProgress', 'AcHTTP', function ($scope, $ocLazyLoad, $http, ngProgress, AcHTTP) {
+    $scope.RightContent = "";
+    $scope.arHTMLCache = Array();
+    $scope.CurrentModule = "AcpObject"; // defualt Index
+    $scope.LoginMode = false;
+
     $scope.$watch('CurrentModule', function (sNewModule, sOldModule) {
+        if ($scope.LoginMode) {
+            return;
+        }
         $scope._Load(sNewModule);
     });
 
@@ -50,7 +81,7 @@
         if (sModule == "") {
             return;
         }
-        
+
         if ($scope.arHTMLCache[sModule] !== undefined) {
             var _Data = $scope.arHTMLCache[sModule];
             $scope.RightContent = _Data.Content;
@@ -60,7 +91,11 @@
         }
 
         ngProgress.reset().start();
-        $scope.Request(BaseURL + 'index.php', { "Module": sModule, "Action": 1000 }).then(function (_Data) {
+        AcHTTP.Request(BaseURL + 'index.php', { "Module": sModule, "Action": 1000 }).then(function (_Data) {
+            sModule = _Data.Module;
+            if (sModule == 'Login') {
+                $scope.LoginMode = true;
+            }
             $ocLazyLoad.load({
                 name: 'Angular' + sModule,
                 files: ['../ApplicationFiles/Modules/' + sModule + '/js/Angular' + sModule]

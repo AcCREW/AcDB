@@ -44,7 +44,7 @@
  */
 class CSHA1 {
 
-	public static function Initialize() {
+	public static function _Initialize() {
 		log_message('debug', "SHA1 Class Initialized");
 	}
 

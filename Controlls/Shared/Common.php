@@ -96,3 +96,9 @@ if (!function_exists('Dump')) {
         Application::$DumpContent .= $sContent;
     }
 }
+if (!function_exists('ConvertBytesToString')) {
+    function ConvertBytesToString($vSize) {
+        $arUnits = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        return @round($vSize/pow(1024,($i=floor(log($vSize,1024)))),2).' '.$arUnits[$i];
+    }
+}

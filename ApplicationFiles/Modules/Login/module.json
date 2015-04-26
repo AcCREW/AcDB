@@ -1,0 +1,13 @@
+﻿{
+    "Module": "Login",
+    "Author": "Ac0",
+    "Enabled": true,
+    "AngularJSIncluded": true,
+    "CSS": [
+    ],
+    "JS": { 
+    },
+    "JSSchemes": {
+    }
+
+}

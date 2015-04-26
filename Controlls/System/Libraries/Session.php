@@ -24,7 +24,7 @@ class CSession {
 	 * The constructor runs the session routines automatically
 	 * whenever the class is instantiated.
 	 */
-	public static function Initialize() {
+	public static function _Initialize() {
 		foreach (array('SESS_ENCRYPT_COOKIE', 'SESS_EXPIRATION', 'SESS_EXPIRE_ON_CLOSE', 'SESS_MATCH_IP', 'SESS_MATCH_USERAGENT', 'SESS_COOKIE_NAME', 'COOKIE_PATH', 'COOKIE_DOMAIN', 'COOKIE_SECURE', 'SESS_TIME_TO_UPDATE', 'TIME_REFERENCE', 'COOKIE_PREFIX', 'ENCRYPTION_KEY') as $sKey) {
             $vParam = Application::GetConfig($sKey);
             if($vParam !== false) {
@@ -60,6 +60,8 @@ class CSession {
 		} else {
 			self::SessUpdate();
 		}
+        
+        Application::$IsLogged = self::Get('IsLogged') === true;
 	}
 
 	// --------------------------------------------------------------------
@@ -257,10 +259,12 @@ class CSession {
 	 * @param	string
 	 * @return	string
 	 */
-	public static function Userdata($nName) {
-		return (!isset(self::$Userdata[$nName])) ? false : self::$Userdata[$nName];
+	public static function Userdata($sName) {
+		return (!isset(self::$Userdata[$sName])) ? false : self::$Userdata[$sName];
 	}
-
+	public static function Get($sName) {
+        return self::Userdata($sName);
+    }
 	// --------------------------------------------------------------------
 
 	/**

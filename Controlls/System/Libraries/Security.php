@@ -85,7 +85,7 @@ class CSecurity {
 	 *
 	 * @return	void
 	 */
-	public static function Initialize() {
+	public static function _Initialize() {
 		// Is CSRF protection enabled?
 		if (Application::GetConfig('CSRF_PROTECTION') === true) {
 			// CSRF config
@@ -118,8 +118,9 @@ class CSecurity {
 		// If it's not a POST request we will set the CSRF cookie
 		if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'POST') {
 			self::CSRFSetCookie();
+            return;
 		}
-
+        
 		// Do the tokens exist in both the _POST and _COOKIE arrays?
 		if (!isset($_POST[self::$CSRF_TOKEN_NAME], $_COOKIE[self::$CSRF_COOKIE_NAME])) {
 			self::CSRFShowError();

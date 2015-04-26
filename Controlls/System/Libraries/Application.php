@@ -11,20 +11,13 @@ require_once("./Controlls/System/Libraries/Loader.php");
  * @property array $JSON Stores all loaded JSONs
  * @property array $Config Stores all configs
  * @property string $DumpContent Stores all dumps and print them in content
- * @property DB $DB DB Class
- * @property CEncrypt $Encrypt Encrypt Class
- * @property Check $Check Check Class
- * @property CInput $Input Input Class
- * @property Parser $Parser Parser Class
- * @property CSecurity $Security Security Class
- * @property CSession $Session Session Class
- * @property SHA1 $SHA1 SHA1 Class
- * @property Utf8 $Utf8 Utf8 Class
  */
 class Application {
     const _ACTION_INITIALIZE_ACDB = 0;
     const _ACTION_LOAD_MODULE = 1000;
     const _ACTION_SAVE = 1001;
+    
+    static $IsLogged = false;
     
     static $_this = null;
     static $Title = null;
@@ -48,6 +41,23 @@ class Application {
     public function Start() {
         switch ($this->Action) {
             case self::_ACTION_SAVE:
+                $sModule = CInput::Post('Module');
+                if($sModule == 'Login') {
+                    $sEMail = strtolower((string) CInput::Post('EMail'));
+                    $sPassword = strtolower((string) CInput::Post('Password'));
+                    $arData = array();
+                    if(sha1($sEMail.':'.$sPassword) == 'ba711b7bdec5d9de73568c0ae45a8fefd012ae4b') {
+                        CSession::Set('IsLogged', true);
+                        $arData['Error'] = 0;
+                        $arData['Message'] = 'Successfuly logged in.';
+                    } else {
+                        CSession::Set('IsLogged', false);
+                        $arData['Error'] = 1;
+                        $arData['Message'] = 'Invalid EMail/Password.';
+                    }
+                    header('Content-Type: application/json');
+                    exit (json_encode($arData));
+                }
                 $ApplicationGenerator = new ApplicationGenerator();
                 $ApplicationGenerator->Generate();
                 break;
@@ -69,11 +79,15 @@ class Application {
                 break;
             case self::_ACTION_LOAD_MODULE:
                 #region - Load Module - 
-                $sModule = CInput::Get('Module');
-                $sModule = $sModule !== false && !empty($sModule) ? $sModule : DEFAULT_CONTROLLER;
-                $sFunction =  CInput::Get('Function');
-                $sFunction = $sFunction !== false && !empty($sFunction) ? $sFunction : DEFAULT_FUNCTION;
-                
+                if(!self::$IsLogged) {
+                    $sModule = 'Login';
+                    $sFunction = DEFAULT_FUNCTION;
+                } else {
+                    $sModule = CInput::Get('Module');
+                    $sModule = $sModule !== false && !empty($sModule) ? $sModule : DEFAULT_CONTROLLER;
+                    $sFunction =  CInput::Get('Function');
+                    $sFunction = $sFunction !== false && !empty($sFunction) ? $sFunction : DEFAULT_FUNCTION;
+                }    
                 if(($Error = Loader::LoadModule($sModule)) instanceof Error) {
                     show_error($Error->Message);
                 }
@@ -89,10 +103,12 @@ class Application {
                 //Dump($this->Check->CompareMemories());
                 $arData['ModuleTitle'] = Application::$Title;
                 $arData['SiteTitle'] = Application::GetConfig('site_title');
+                $arData['Module'] = $sModule;
+                $arData['Function'] = $sFunction;
                 $arData['Content'] = self::$DumpContent.$sContent;
                 header('Content-Type: application/json');
                 exit (json_encode($arData));
-                #endregion
+            #endregion
         }
     }
     
@@ -108,7 +124,7 @@ class Application {
     }
     
     private function InitializeAction() {
-        $nAction = CInput::Get('Action');
+        $nAction = CInput::PostGet('Action');
         if($nAction !== false) {
             $this->Action = $nAction;    
         }

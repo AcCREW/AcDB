@@ -105,8 +105,8 @@ class Loader {
             return $Error;
         }
         
-        if($sType == LIBRARIES && $bInitialize && method_exists($sName, 'Initialize')) {
-            $sName::Initialize();
+        if($sType == LIBRARIES && $bInitialize && method_exists($sName, '_Initialize')) {
+            $sName::_Initialize();
         }
         
         return true;

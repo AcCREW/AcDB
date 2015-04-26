@@ -16,7 +16,7 @@ class CUtf8 {
 	 * Constructor
 	 * Determines if UTF-8 support is to be enabled
 	 */
-	public static function Initialize() {
+	public static function _Initialize() {
 		log_message('debug', "Utf8 Class Initialized");
 
 		if (

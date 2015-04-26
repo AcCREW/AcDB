@@ -11,6 +11,8 @@
     <script type="text/javascript" src="{BaseURL}ApplicationFiles/Templates/Default/js/angular/require.js" charset="UTF8"></script>
     <script>
         var BaseURL = "{BaseURL}";
+        var CSRFTokenValue = "{CSRF_TOKEN_VALUE}";
+        var CSRFTokenName = "{CSRF_TOKEN_NAME}";
         requirejs.config({
             baseUrl: 'js/',
             paths: {PreloadedJS},

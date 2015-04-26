@@ -13,7 +13,7 @@ class CEncrypt {
 	 * Simply determines whether the mcrypt library exists.
 	 *
 	 */
-	public static function Initialize() {
+	public static function _Initialize() {
 		self::$_MCryptExists = (!function_exists('mcrypt_encrypt')) ? false : true;
         if(($sHashType = Application::GetConfig('HASH_TYPE')) !== false) {
             self::$HASH_TYPE = $sHashType;

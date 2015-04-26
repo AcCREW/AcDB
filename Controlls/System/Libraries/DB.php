@@ -7,41 +7,39 @@
  *
  * @author Венцислав Кьоровски
  */
-class DB {
-    public $Host = null;
-    public $Username = null;
-    public $Password = null;
-    public $DB = null;
-    public $Port = null;
-    public $_mysqli = null;
+class CDB {
+    public static $Host = null;
+    public static $Username = null;
+    public static $Password = null;
+    public static $DB = null;
+    public static $Port = null;
     
     public static $_instance = null;
     
-    public function DB() {
-        $this->Host = Application::GetConfig('mysql_host');
-        $this->Username = Application::GetConfig('mysql_user');
-        $this->Password = Application::GetConfig('mysql_password');
-        $this->DB = Application::GetConfig('mysql_db');
-        $sPort = Application::GetConfig('mysql_port');
+    public function _Initialize() {
+        self::$Host = Application::GetConfig('MYSQL_HOST');
+        self::$Username = Application::GetConfig('MYSQL_USER');
+        self::$Password = Application::GetConfig('MYSQL_PASSOWRD');
+        self::$DB = Application::GetConfig('MYSQL_DB');
+        $sPort = Application::GetConfig('MYSQL_PORT');
         
         if($sPort == null)
-            $this->Port = ini_get('mysqli.default_port');
+            self::$Port = ini_get('mysqli.default_port');
         else
-            $this->Port = $sPort;
+            self::$Port = $sPort;
 
-        $this->Connect();
-        self::$_instance = $this;
+        self::Connect();
     }
     
     public static function GetInstance() {
         return self::$_instance;
     }
     
-    public function Connect() {
-        $this->_mysqli = new mysqli($this->Host, $this->Username, $this->Password, $this->DB, $this->Port)
+    public static function Connect() {
+        self::$_instance = new mysqli(self::$Host, self::$Username, self::$Password, self::$DB, self::$Port)
             or show_error('There was a problem connecting to the database');
 
-        $this->_mysqli->set_charset('utf8');
+        self::$_instance->set_charset('utf8');
     }
     
     public function Get($sQuery) {
